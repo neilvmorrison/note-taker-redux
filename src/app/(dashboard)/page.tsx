@@ -1,12 +1,14 @@
+import ChatInit from "@/components/chat-init";
+import { Text } from "@/components/ui/text";
+
 export default function Page() {
   return (
-    <>
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div className="bg-muted/50 aspect-video rounded-xl" />
-        <div className="bg-muted/50 aspect-video rounded-xl" />
-        <div className="bg-muted/50 aspect-video rounded-xl" />
+    <div className="mt-12 flex flex-col items-center justify-center">
+      <div className="min-w-[480px] text-center flex flex-col gap-3">
+        <Text variant="h2">What are we doing today?</Text>
+        <Text>Type below to get started</Text>
+        <ChatInit />
       </div>
-      <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-    </>
+    </div>
   );
 }
