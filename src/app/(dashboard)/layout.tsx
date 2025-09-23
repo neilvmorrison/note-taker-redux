@@ -29,15 +29,15 @@ export default async function DashboardLayout({
   }
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user_profile={currentUser} />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
+        <header className="flex h-14 md:h-16 shrink-0 items-center gap-2 border-b px-3 md:px-4">
+          <SidebarTrigger className="-ml-0.5 md:-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-1 md:mr-2 data-[orientation=vertical]:h-4"
           />
-          <Breadcrumb>
+          <Breadcrumb className="text-sm md:text-base">
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink href="#">
@@ -46,13 +46,17 @@ export default async function DashboardLayout({
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                <BreadcrumbPage className="text-nowrap overflow-hidden text-ellipsis max-w-[180px] md:max-w-none">
+                  Data Fetching
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
           <LogoutButton className="ml-auto cursor-pointer" />
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+        <div className="flex flex-1 flex-col gap-3 md:gap-4 p-3 md:p-4 overflow-auto">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

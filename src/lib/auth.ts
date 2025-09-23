@@ -18,7 +18,7 @@ export interface AuthUser {
   };
 }
 
-export async function getCurrentUser(): Promise<AuthUser | null> {
+export async function getCurrentUser(): Promise<UserProfile | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -29,7 +29,18 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  return user as AuthUser;
+  if (user) {
+    const { data: user_profile, error: up_error } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+    if (!user_profile || up_error) {
+      return null;
+    }
+    return user_profile;
+  }
+  return null;
 }
 
 export async function getUserProfile(
