@@ -34,6 +34,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      notes: {
+        Row: {
+          author_id: string | null
+          content: Json | null
+          created_at: string | null
+          deleted_at: string | null
+          id: string
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content?: Json | null
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: Json | null
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           base_prompt: string | null

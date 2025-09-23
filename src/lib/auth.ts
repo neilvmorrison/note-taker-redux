@@ -1,13 +1,7 @@
 import { createClient } from "./supabase/server";
+import { Database } from "./supabase/types/database";
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  first_name: string | null;
-  last_name: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"];
 
 export interface AuthUser {
   id: string;
