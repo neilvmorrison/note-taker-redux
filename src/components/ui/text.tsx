@@ -15,6 +15,7 @@ const textVariants = cva("", {
       h6: "scroll-m-20 text-base font-semibold tracking-tight",
       body: "text-base leading-7",
       "body-bold": "text-base font-semibold leading-7",
+      muted: "text-sm text-muted-foreground",
     },
   },
   defaultVariants: {

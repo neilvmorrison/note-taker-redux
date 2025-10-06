@@ -11,6 +11,12 @@ import { Spinner } from "@/components/ui/spinner";
 import { Save, ArrowLeft } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { ProjectNoteSelector } from "@/components/project-note-selector";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function NoteDetail() {
   const { id } = useParams();
@@ -142,6 +148,23 @@ export default function NoteDetail() {
               {isSaving ? "Saving..." : "Unsaved changes"}
             </span>
           )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center">
+                <ProjectNoteSelector
+                  noteId={note.id}
+                  onAssign={(success, projectSlug) => {
+                    if (success) {
+                      // Optionally show a success message or refresh data
+                    }
+                  }}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Assign this note to a project</p>
+            </TooltipContent>
+          </Tooltip>
           <Button
             variant="outline"
             size="sm"

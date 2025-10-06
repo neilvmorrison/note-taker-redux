@@ -98,6 +98,141 @@ export async function getAllNotes({
   return notes;
 }
 
+export async function getAllProjectNotes(project_slug: string) {
+  const sb = await createClient();
+
+  // First get the project ID from the slug
+  const { data: project, error: projectError } = await sb
+    .from("projects")
+    .select("id")
+    .eq("slug", project_slug)
+    .is("deleted_at", null)
+    .single();
+
+  if (projectError) throw projectError;
+  if (!project)
+    throw new Error(`Project with slug '${project_slug}' not found`);
+
+  // Then get all notes linked to this project
+  const { data: projectNotes, error } = await sb
+    .from("project_notes")
+    .select(
+      `
+      id,
+      note_id,
+      project_id,
+      notes:note_id(
+        id,
+        title,
+        content,
+        created_at,
+        updated_at,
+        author_id
+      )
+    `
+    )
+    .eq("project_id", project.id)
+    .is("deleted_at", null);
+
+  if (error) throw error;
+
+  // Transform the data to match the expected format
+  const notes = projectNotes?.map((item) => item.notes) || [];
+
+  return notes;
+}
+
+export async function addNoteToProject(
+  noteId: string,
+  projectIdOrSlug: string
+) {
+  const sb = await createClient();
+  let projectId = projectIdOrSlug;
+
+  // If a slug was provided, get the project ID first
+  if (
+    !projectIdOrSlug.match(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    )
+  ) {
+    const { data: project, error: projectError } = await sb
+      .from("projects")
+      .select("id")
+      .eq("slug", projectIdOrSlug)
+      .is("deleted_at", null)
+      .single();
+
+    if (projectError) throw projectError;
+    if (!project)
+      throw new Error(`Project with slug '${projectIdOrSlug}' not found`);
+
+    projectId = project.id;
+  }
+
+  // Check if the note already exists in the project to avoid duplicates
+  const { data: existingLink, error: checkError } = await sb
+    .from("project_notes")
+    .select("id")
+    .eq("note_id", noteId)
+    .eq("project_id", projectId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (checkError) throw checkError;
+
+  // If the link already exists, return early
+  if (existingLink) {
+    return {
+      success: true,
+      data: existingLink,
+    };
+  }
+
+  // Create the project-note link
+  const { data: projectNote, error } = await sb
+    .from("project_notes")
+    .insert({
+      note_id: noteId,
+      project_id: projectId,
+    })
+    .select("*")
+    .single();
+
+  if (error) throw error;
+
+  return {
+    success: true,
+    data: projectNote,
+  };
+}
+
+export async function createNoteInProject(
+  payload: InsertNotePayload,
+  projectSlug: string
+) {
+  // First create the note
+  const noteResult = await createNote(payload);
+
+  if (!noteResult.success || !noteResult.data) {
+    return noteResult;
+  }
+
+  // Then link it to the project
+  try {
+    await addNoteToProject(noteResult.data.id, projectSlug);
+    return noteResult;
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to add note to project",
+      data: noteResult.data, // Return the note data anyway, since it was created successfully
+    };
+  }
+}
+
 export async function searchNotes({
   title,
   authorId,
