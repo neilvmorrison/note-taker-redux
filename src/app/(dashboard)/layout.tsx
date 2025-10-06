@@ -1,13 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import BreadcrumbNav from "@/components/breadcrumb-nav";
 import LogoutButton from "@/components/logout-button";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -37,21 +30,14 @@ export default async function DashboardLayout({
             orientation="vertical"
             className="mr-1 md:mr-2 data-[orientation=vertical]:h-4"
           />
-          <Breadcrumb className="text-sm md:text-base">
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-nowrap overflow-hidden text-ellipsis max-w-[180px] md:max-w-none">
-                  Data Fetching
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <BreadcrumbNav
+            className="text-sm md:text-base"
+            labels={{
+              notes: "Notes",
+              projects: "Projects",
+              profile: "User Profile",
+            }}
+          />
           <LogoutButton className="ml-auto cursor-pointer" />
         </header>
         <div className="flex flex-1 flex-col gap-3 md:gap-4 p-3 md:p-4 overflow-auto">
