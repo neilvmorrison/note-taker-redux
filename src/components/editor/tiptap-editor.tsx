@@ -44,6 +44,137 @@ export function TiptapEditor({
   placeholder = "Write something...",
   className,
 }: TiptapEditorProps) {
+  // Add custom CSS for ProseMirror editor to ensure full clickability
+  useEffect(() => {
+    // Add custom CSS for the ProseMirror editor with strong styling rules
+    const style = document.createElement("style");
+    style.innerHTML = `
+      .ProseMirror {
+        min-height: 100%;
+        outline: none !important;
+        width: 100%;
+        height: 100%;
+        display: block !important;
+      }
+      
+      /* Force style reapplication when format is changed */
+      .ProseMirror.format-changed * {
+        display: inline-block;
+      }
+      .ProseMirror.format-changed * {
+        display: initial;
+      }
+      
+      /* Placeholder styling */
+      .ProseMirror p.is-editor-empty:first-child::before {
+        color: #adb5bd;
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+      }
+      
+      /* Headings with !important to ensure they display properly */
+      .ProseMirror h1 {
+        font-size: 2em !important;
+        font-weight: bold !important;
+        line-height: 1.2 !important;
+        margin-top: 0.67em !important;
+        margin-bottom: 0.67em !important;
+      }
+      
+      .ProseMirror h2 {
+        font-size: 1.5em !important;
+        font-weight: bold !important;
+        line-height: 1.3 !important;
+        margin-top: 0.83em !important;
+        margin-bottom: 0.83em !important;
+      }
+      
+      .ProseMirror h3 {
+        font-size: 1.17em !important;
+        font-weight: bold !important;
+        line-height: 1.4 !important;
+        margin-top: 1em !important;
+        margin-bottom: 1em !important;
+      }
+      
+      /* Text formatting */
+      .ProseMirror strong, .ProseMirror b {
+        font-weight: bold !important;
+      }
+      
+      .ProseMirror em, .ProseMirror i {
+        font-style: italic !important;
+      }
+      
+      .ProseMirror u {
+        text-decoration: underline !important;
+      }
+      
+      .ProseMirror s, .ProseMirror strike {
+        text-decoration: line-through !important;
+      }
+      
+      /* Code blocks */
+      .ProseMirror code {
+        font-family: monospace !important;
+        background-color: rgba(97, 97, 97, 0.1) !important;
+        border-radius: 3px !important;
+        padding: 0.2em 0.4em !important;
+      }
+      
+      .ProseMirror pre {
+        background-color: #0D0D0D !important;
+        color: white !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 0.5rem !important;
+        font-family: monospace !important;
+        margin: 1rem 0 !important;
+      }
+      
+      .ProseMirror pre code {
+        color: inherit !important;
+        background: none !important;
+        padding: 0 !important;
+      }
+      
+      /* Lists */
+      .ProseMirror ul {
+        list-style-type: disc !important;
+        padding-left: 1.5em !important;
+        margin: 1em 0 !important;
+      }
+      
+      .ProseMirror ol {
+        list-style-type: decimal !important;
+        padding-left: 1.5em !important;
+        margin: 1em 0 !important;
+      }
+      
+      .ProseMirror li {
+        margin-bottom: 0.5em !important;
+      }
+      
+      /* Links */
+      .ProseMirror a {
+        color: #0074de !important;
+        text-decoration: underline !important;
+      }
+      
+      /* Images */
+      .ProseMirror img {
+        max-width: 100% !important;
+        height: auto !important;
+        border-radius: 4px !important;
+        margin: 1em 0 !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
   const { isMobile } = useMobile();
   const [isFocused, setIsFocused] = useState(false);
 
@@ -118,6 +249,29 @@ export function TiptapEditor({
     }
   }, [editor, content]);
 
+  // Force editor to apply styles immediately when format changes
+  useEffect(() => {
+    if (!editor) return;
+
+    // Add a transaction handler to ensure styles are applied immediately
+    const updateHandler = () => {
+      // Force a DOM update by adding a class and removing it
+      const editorElement = document.querySelector(".ProseMirror");
+      if (editorElement) {
+        editorElement.classList.add("format-changed");
+        setTimeout(() => {
+          editorElement.classList.remove("format-changed");
+        }, 10);
+      }
+    };
+
+    editor.on("transaction", updateHandler);
+
+    return () => {
+      editor.off("transaction", updateHandler);
+    };
+  }, [editor]);
+
   // Use client-side rendering with useEffect to avoid hydration errors
   const [isMounted, setIsMounted] = useState(false);
 
@@ -129,25 +283,34 @@ export function TiptapEditor({
     <div className={cn("flex flex-col", className)}>
       {isMounted && editor && (
         <>
-          {isMobile ? (
-            <MobileEditorToolbar
-              editor={editor}
-              className={cn(
-                "transition-opacity",
-                isFocused ? "opacity-100" : "opacity-0"
+          {isFocused && (
+            <>
+              {isMobile ? (
+                <MobileEditorToolbar
+                  editor={editor}
+                  className={cn("transition-opacity", "opacity-100")}
+                />
+              ) : (
+                <EditorToolbar
+                  editor={editor}
+                  className={cn(
+                    "transition-opacity duration-200",
+                    "opacity-100"
+                  )}
+                />
               )}
-            />
-          ) : (
-            <EditorToolbar editor={editor} />
+            </>
           )}
           <EditorContent
             editor={editor}
             className={cn(
               "prose dark:prose-invert max-w-none w-full",
-              "border rounded-md p-3 sm:p-5 min-h-[200px] focus-within:border-primary",
+              "rounded-md p-3 sm:p-5 min-h-[200px]",
+              isFocused ? "border border-primary" : "border-transparent",
+              "transition-colors duration-200",
               "sm:text-base text-sm",
-              "prose-headings:mb-2 prose-headings:mt-4 prose-p:my-2",
-              "prose-img:my-4"
+              "cursor-text outline-none",
+              "editor-container" // Added custom class for styling
             )}
           />
         </>
