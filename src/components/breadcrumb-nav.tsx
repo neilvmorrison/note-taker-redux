@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import CreateNoteButton from "./create-note-button";
 
 interface BreadcrumbNavProps {
   /**
@@ -34,9 +35,7 @@ export function BreadcrumbNav({
   exclude = ["(dashboard)"],
   className,
 }: BreadcrumbNavProps) {
-  // Define transformation logic inside the client component
   const defaultTransformParam = (param: string, value: string) => {
-    // Transform IDs to more readable formats
     if (param === "id") {
       return `Item ${value}`;
     }
@@ -49,9 +48,12 @@ export function BreadcrumbNav({
     transformParam: defaultTransformParam,
   });
 
-  // If there's only the home breadcrumb, don't render anything
   if (breadcrumbs.length <= 1) {
-    return null;
+    return (
+      <>
+        <CreateNoteButton />
+      </>
+    );
   }
 
   return (
