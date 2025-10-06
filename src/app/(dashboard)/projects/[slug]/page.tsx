@@ -3,11 +3,11 @@ import { Text } from "@/components/ui/text";
 import { useParams } from "next/navigation";
 
 export default function ProjectDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
   return (
     <div>
       <Text variant="h1" component="h1">
-        Note {id}
+        Note {slug}
       </Text>
     </div>
   );

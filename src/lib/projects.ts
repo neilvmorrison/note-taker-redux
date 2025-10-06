@@ -26,7 +26,10 @@ export async function createProject(payload: InsertProjectPayload) {
     .single();
 
   if (error) throw error;
-  return created_project;
+  return {
+    success: true,
+    data: created_project,
+  };
 }
 
 export async function updateProject(payload: UpdateProjectPayload) {
