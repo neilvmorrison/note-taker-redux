@@ -40,11 +40,16 @@ export async function createNote(payload: InsertNotePayload) {
 }
 
 export async function updateNote(payload: UpdateNotePayload) {
+  if (!payload.id) {
+    throw new Error("Note ID is required for update operation");
+  }
+
   const sb = await createClient();
 
   const { data: updated_note, error } = await sb
     .from("notes")
     .update(payload)
+    .eq("id", payload.id) // Add WHERE clause to specify which note to update
     .select("*")
     .single();
 
