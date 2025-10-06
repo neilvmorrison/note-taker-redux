@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Note Taker",
+  title: "Duley Noted",
   description: "A place to centralize, organize and ideate",
 };
 
