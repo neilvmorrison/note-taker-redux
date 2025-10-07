@@ -131,3 +131,5 @@ export async function searchProjects({
   if (error) throw error;
   return projects;
 }
+
+
