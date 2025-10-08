@@ -1,7 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import BreadcrumbNav from "@/components/breadcrumb-nav";
 import LogoutButton from "@/components/logout-button";
-import IconButton from "@/components/ui/icon-button";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,

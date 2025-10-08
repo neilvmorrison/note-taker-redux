@@ -67,7 +67,19 @@ export async function getNoteById(id: string) {
     .single();
 
   if (error) throw error;
-  return found_note;
+
+  if (found_note) {
+    const { data: project_data, error: project_error } = await sb
+      .from("project_notes")
+      .select("*")
+      .eq("note_id", found_note.id)
+      .maybeSingle();
+    if (project_error) throw project_error;
+    return {
+      ...found_note,
+      project_id: project_data?.project_id ?? null,
+    };
+  }
 }
 
 export async function getAllNotes({

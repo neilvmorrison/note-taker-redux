@@ -20,18 +20,19 @@ import { addNoteToProject } from "@/lib/notes";
 
 interface ProjectNoteSelectorProps {
   noteId: string;
+  projectId: string | null;
   onAssign?: (success: boolean, projectSlug: string) => void;
 }
 
 export function ProjectNoteSelector({
   noteId,
+  projectId,
   onAssign,
 }: ProjectNoteSelectorProps) {
   const [open, setOpen] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(false);
-  const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
     async function loadProjects() {
@@ -39,6 +40,11 @@ export function ProjectNoteSelector({
       try {
         const projectsData = await getAllProjects();
         setProjects(projectsData);
+        if (projectId) {
+          const existingProject =
+            projectsData.find((proj) => proj.id === projectId) ?? null;
+          setSelectedProject(existingProject);
+        }
       } catch (error) {
         console.error("Failed to load projects:", error);
       } finally {
@@ -46,17 +52,17 @@ export function ProjectNoteSelector({
       }
     }
     loadProjects();
-  }, []);
+  }, [projectId]);
 
-  const handleProjectSelect = (project: Project) => {
+  const handleProjectSelect = async (project: Project) => {
     setSelectedProject(project);
+    await handleAssign(project);
     setOpen(false);
   };
 
-  const handleAssign = async () => {
+  const handleAssign = async (selectedProject: Project) => {
     if (!selectedProject) return;
 
-    setAssigning(true);
     try {
       await addNoteToProject(noteId, selectedProject.slug);
       onAssign?.(true, selectedProject.slug);
@@ -64,7 +70,6 @@ export function ProjectNoteSelector({
       console.error("Failed to assign note to project:", error);
       onAssign?.(false, selectedProject.slug);
     } finally {
-      setAssigning(false);
     }
   };
 
@@ -76,7 +81,7 @@ export function ProjectNoteSelector({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between w-[200px]"
+            className="justify-between min-w-[200px]"
             disabled={loading}
           >
             {selectedProject ? selectedProject.name : "Select project..."}
@@ -108,13 +113,6 @@ export function ProjectNoteSelector({
           </Command>
         </PopoverContent>
       </Popover>
-      <Button
-        onClick={handleAssign}
-        disabled={!selectedProject || assigning}
-        size="sm"
-      >
-        {assigning ? "Assigning..." : "Assign"}
-      </Button>
     </div>
   );
 }

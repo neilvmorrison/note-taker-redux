@@ -2,11 +2,7 @@
 
 import { CreateProjectDialog } from "./create-project-dialog";
 
-interface CreateProjectButtonProps {
-  className?: string;
-}
-
-export function CreateProjectButton({ className }: CreateProjectButtonProps) {
+export function CreateProjectButton() {
   return <CreateProjectDialog />;
 }
 

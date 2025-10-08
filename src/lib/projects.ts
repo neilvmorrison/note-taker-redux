@@ -1,5 +1,6 @@
 "use server";
 
+import { getCurrentUser } from "./auth";
 import { createClient } from "./supabase/server";
 import { Database } from "./supabase/types/database";
 
@@ -18,10 +19,11 @@ export type ProjectsSearchParams = {
 
 export async function createProject(payload: InsertProjectPayload) {
   const sb = await createClient();
-
+  const currentUser = await getCurrentUser();
+  if (!currentUser) throw new Error("User Not Found");
   const { data: created_project, error } = await sb
     .from("projects")
-    .insert(payload)
+    .insert({ ...payload, owner_id: currentUser.id })
     .select("*")
     .single();
 
@@ -75,19 +77,17 @@ export async function getProjectBySlug(slug: string) {
 export async function getAllProjects({
   limit = 50,
   offset = 0,
-  ownerId,
 }: { limit?: number; offset?: number; ownerId?: string } = {}) {
   const sb = await createClient();
-
+  const currentUser = await getCurrentUser();
+  if (!currentUser) throw new Error("User Not Found");
   let query = sb
     .from("projects")
     .select("*")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (ownerId) {
-    query = query.eq("owner_id", ownerId);
-  }
+  query = query.eq("owner_id", currentUser.id);
 
   // Don't fetch deleted projects
   query = query.is("deleted_at", null);
@@ -101,12 +101,12 @@ export async function getAllProjects({
 export async function searchProjects({
   name,
   slug,
-  ownerId,
   limit = 50,
   offset = 0,
 }: ProjectsSearchParams = {}) {
   const sb = await createClient();
-
+  const currentUser = await getCurrentUser();
+  if (!currentUser) throw new Error("User Not Found");
   let query = sb
     .from("projects")
     .select("*")
@@ -122,14 +122,10 @@ export async function searchProjects({
     query = query.eq("slug", slug);
   }
 
-  if (ownerId) {
-    query = query.eq("owner_id", ownerId);
-  }
+  query = query.eq("owner_id", currentUser.id);
 
   const { data: projects, error } = await query;
 
   if (error) throw error;
   return projects;
 }
-
-

@@ -6,7 +6,6 @@ import TiptapEditor from "@/components/editor/tiptap-editor";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Save, ArrowLeft } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
@@ -27,6 +26,7 @@ export default function NoteDetail() {
     id: string;
     title: string;
     content: string;
+    project_id: string | null;
   } | null>(null);
 
   // Fetch note data
@@ -41,10 +41,15 @@ export default function NoteDetail() {
       try {
         setLoading(true);
         const noteData = await getNoteById(id);
+        if (!noteData) {
+          setNote(null);
+          return;
+        }
         setNote({
           id: noteData.id,
           title: noteData.title || "Untitled Note",
           content: noteData.content ? String(noteData.content) : "",
+          project_id: noteData.project_id ?? null,
         });
       } catch (err) {
         setError("Failed to load note.");
@@ -153,11 +158,7 @@ export default function NoteDetail() {
               <div className="flex items-center">
                 <ProjectNoteSelector
                   noteId={note.id}
-                  onAssign={(success, projectSlug) => {
-                    if (success) {
-                      // Optionally show a success message or refresh data
-                    }
-                  }}
+                  projectId={note.project_id}
                 />
               </div>
             </TooltipTrigger>
