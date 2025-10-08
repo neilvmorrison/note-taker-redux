@@ -39,7 +39,7 @@ export async function updateProject(payload: UpdateProjectPayload) {
 
   const { data: updated_project, error } = await sb
     .from("projects")
-    .update(payload)
+    .update({ ...payload, updated_at: new Date().toISOString() })
     .select("*")
     .single();
 

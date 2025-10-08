@@ -1,5 +1,6 @@
 "use server";
 
+import { note_event_types } from "@/constants";
 import { getCurrentUser } from "./auth";
 import { createClient } from "./supabase/server";
 import { Database } from "./supabase/types/database";
@@ -7,6 +8,14 @@ import { Database } from "./supabase/types/database";
 export type InsertNotePayload = Database["public"]["Tables"]["notes"]["Insert"];
 export type UpdateNotePayload = Database["public"]["Tables"]["notes"]["Update"];
 export type Note = Database["public"]["Tables"]["notes"]["Row"];
+export type NoteAction = Database["public"]["Tables"]["note_actions"]["Row"] & {
+  actor?: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    email: string;
+  } | null;
+};
 export type NotesSearchParams = {
   title?: string;
   authorId?: string;
@@ -26,6 +35,16 @@ export async function createNote(payload: InsertNotePayload) {
       .single();
 
     if (error) throw error;
+
+    if (created_note) {
+      await sb.from("note_actions").insert({
+        previous_state: null,
+        updated_state: null,
+        event_type: note_event_types.created,
+        note_id: created_note.id,
+        actor_id: currentUser?.id,
+      });
+    }
 
     return {
       success: true,
@@ -48,7 +67,7 @@ export async function updateNote(payload: UpdateNotePayload) {
 
   const { data: updated_note, error } = await sb
     .from("notes")
-    .update(payload)
+    .update({ ...payload, updated_at: new Date().toISOString() })
     .eq("id", payload.id) // Add WHERE clause to specify which note to update
     .select("*")
     .single();
@@ -272,4 +291,27 @@ export async function searchNotes({
 
   if (error) throw error;
   return notes;
+}
+
+export async function getNoteActions(noteId: string) {
+  const sb = await createClient();
+
+  const { data: actions, error } = await sb
+    .from("note_actions")
+    .select(
+      `
+      *,
+      actor:actor_id(
+        id,
+        first_name,
+        last_name,
+        email
+      )
+    `
+    )
+    .eq("note_id", noteId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return actions as NoteAction[];
 }

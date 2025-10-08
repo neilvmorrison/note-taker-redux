@@ -11,6 +11,7 @@ import { Save, ArrowLeft } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { ProjectNoteSelector } from "@/components/project-note-selector";
+import { NoteHistoryDrawer } from "@/components/note-history-drawer";
 import {
   Tooltip,
   TooltipContent,
@@ -166,19 +167,22 @@ export default function NoteDetail() {
               <p>Assign this note to a project</p>
             </TooltipContent>
           </Tooltip>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={isSaving || !hasPendingChanges}
-            onClick={forceSave}
-          >
-            {isSaving ? (
-              <Spinner className="h-4 w-4" />
-            ) : (
-              <Save className="h-4 w-4 mr-1" />
-            )}
-            Save
-          </Button>
+          <div className="flex items-center gap-2">
+            <NoteHistoryDrawer noteId={note.id} />
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isSaving || !hasPendingChanges}
+              onClick={forceSave}
+            >
+              {isSaving ? (
+                <Spinner className="h-4 w-4" />
+              ) : (
+                <Save className="h-4 w-4 mr-1" />
+              )}
+              Save
+            </Button>
+          </div>
         </div>
       </div>
 

@@ -34,6 +34,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      note_actions: {
+        Row: {
+          actor_id: string | null
+          created_at: string | null
+          event_type: string | null
+          id: string
+          note_id: string | null
+          previous_state: string | null
+          updated_state: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string | null
+          event_type?: string | null
+          id?: string
+          note_id?: string | null
+          previous_state?: string | null
+          updated_state?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string | null
+          event_type?: string | null
+          id?: string
+          note_id?: string | null
+          previous_state?: string | null
+          updated_state?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_actions_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "note_actions_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notes: {
         Row: {
           author_id: string | null
@@ -197,9 +242,67 @@ export type Database = {
           },
         ]
       }
+      tasks: {
+        Row: {
+          assigned_to: string | null
+          author_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          due_date: string | null
+          estimated_time_hours: number | null
+          id: string
+          status: Database["public"]["Enums"]["task_statuses"] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          author_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          estimated_time_hours?: number | null
+          id?: string
+          status?: Database["public"]["Enums"]["task_statuses"] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          author_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          estimated_time_hours?: number | null
+          id?: string
+          status?: Database["public"]["Enums"]["task_statuses"] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           auth_user_id: string | null
+          avatar_url: string | null
           created_at: string | null
           deleted_at: string | null
           email: string
@@ -211,6 +314,7 @@ export type Database = {
         }
         Insert: {
           auth_user_id?: string | null
+          avatar_url?: string | null
           created_at?: string | null
           deleted_at?: string | null
           email: string
@@ -222,6 +326,7 @@ export type Database = {
         }
         Update: {
           auth_user_id?: string | null
+          avatar_url?: string | null
           created_at?: string | null
           deleted_at?: string | null
           email?: string
@@ -242,6 +347,11 @@ export type Database = {
     }
     Enums: {
       collaborator_roles: "owner" | "editor" | "reader"
+      task_statuses:
+        | "not_started"
+        | "in_progress"
+        | "complete"
+        | "wont_complete"
     }
     CompositeTypes: {
       [_ in never]: never
