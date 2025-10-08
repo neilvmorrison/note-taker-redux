@@ -14,4 +14,5 @@ export async function GET(request: NextRequest) {
       return redirect(next);
     }
   }
+  return redirect("/authentication?auth_error=true");
 }
