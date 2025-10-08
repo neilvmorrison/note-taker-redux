@@ -1,3 +1,4 @@
+"use server";
 import { createClient } from "./supabase/server";
 import { Database } from "./supabase/types/database";
 
@@ -10,6 +11,13 @@ export interface AuthUser {
     first_name?: string;
     last_name?: string;
   };
+}
+
+export interface ProfileUpdate {
+  first_name?: string;
+  last_name?: string;
+  middle_name?: string;
+  avatar_url?: string;
 }
 
 export async function getCurrentUser(): Promise<UserProfile | null> {
@@ -67,7 +75,7 @@ export async function checkEmailExists(email: string): Promise<boolean> {
 
 export async function updateUserProfile(
   userId: string,
-  updates: { first_name?: string; last_name?: string }
+  updates: ProfileUpdate
 ): Promise<UserProfile | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
