@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, isValidElement } from "react";
+import { ReactNode } from "react";
 import { Spinner } from "@/components/ui/spinner";
 
 interface RowOrGridProps<T> {
@@ -17,7 +17,9 @@ interface RowOrGridProps<T> {
 function LoadingState() {
   return (
     <div className="h-[50vh] flex flex-col items-center justify-center">
-      <Spinner size="lg" />
+      <div className="h-[48px]">
+        <Spinner size="lg" />
+      </div>
     </div>
   );
 }
@@ -34,16 +36,6 @@ export default function RowOrGrid<T>({
 }: RowOrGridProps<T>) {
   if (isLoading) {
     return <LoadingState />;
-  }
-
-  if (!items?.length) {
-    return emptyState ? (
-      isValidElement(emptyState) ? (
-        <div className="mt-10">{emptyState}</div>
-      ) : (
-        <div className="mt-10">{emptyState}</div>
-      )
-    ) : null;
   }
 
   if (orientation === "grid") {
