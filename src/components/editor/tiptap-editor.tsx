@@ -316,7 +316,6 @@ export function TiptapEditor({
               "prose dark:prose-invert max-w-none w-full",
               "rounded-md p-3 sm:p-5 min-h-[200px]",
               // Use a consistent border to prevent layout shifts, just change color
-              "border",
               isFocused ? "border-primary" : "border-muted",
               "transition-colors duration-200 ease-in-out",
               "sm:text-base text-sm",

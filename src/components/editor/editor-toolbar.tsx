@@ -12,7 +12,7 @@ import {
   Heading2,
   Heading3,
   Code,
-  Image,
+  Image as ImageIcon,
   Link,
   Undo,
   Redo,
@@ -233,7 +233,7 @@ export default function EditorToolbar({
           onClick={addImage}
           title="Insert Image"
         >
-          <Image className="h-4 w-4" />
+          <ImageIcon className="h-4 w-4" />
         </Button>
 
         <Separator orientation="vertical" className="h-8" />

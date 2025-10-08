@@ -9,8 +9,7 @@ import {
   ListOrdered,
   Heading1,
   Code,
-  Image,
-  Link,
+  Image as ImageIcon,
   MoreHorizontal,
   Undo,
 } from "lucide-react";
@@ -220,7 +219,7 @@ export default function MobileEditorToolbar({
               onClick={addImage}
               className="flex flex-col gap-1 h-auto py-3"
             >
-              <Image className="h-5 w-5" />
+              <ImageIcon className="h-5 w-5" />
               <span className="text-xs">Image</span>
             </Button>
           </div>
