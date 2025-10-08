@@ -187,16 +187,14 @@ export default function NoteDetail() {
         </Alert>
       )}
 
-      <Card className="flex-grow">
-        <CardContent className="pt-6">
-          <TiptapEditor
-            content={note.content}
-            onChange={handleContentChange}
-            placeholder="Start writing your note..."
-            className="min-h-[calc(100vh-250px)]"
-          />
-        </CardContent>
-      </Card>
+      <div className="flex-grow lg:max-w-[768px] border-0 shadow-none">
+        <TiptapEditor
+          content={note.content}
+          onChange={handleContentChange}
+          placeholder="Start writing your note..."
+          className="min-h-[calc(100vh-250px)]"
+        />
+      </div>
     </div>
   );
 }

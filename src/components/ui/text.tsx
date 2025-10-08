@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 const textVariants = cva("", {
   variants: {
     variant: {
-      h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
-      h2: "scroll-m-20 text-3xl font-semibold tracking-tight",
-      h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
-      h4: "scroll-m-20 text-xl font-semibold tracking-tight",
-      h5: "scroll-m-20 text-lg font-semibold tracking-tight",
+      h1: "scroll-m-20 text-2xl font-bold tracking-tight lg:text2xl",
+      h2: "scroll-m-20 text-xl font-semibold tracking-tight",
+      h3: "scroll-m-20 text-lg font-semibold tracking-tight",
+      h4: "scroll-m-20 text-lg font-semibold tracking-tight",
+      h5: "scroll-m-20 text-md font-semibold tracking-tight",
       h6: "scroll-m-20 text-base font-semibold tracking-tight",
       body: "text-base leading-7",
       "body-bold": "text-base font-semibold leading-7",
