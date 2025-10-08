@@ -38,8 +38,11 @@ export default async function DashboardLayout({
               profile: "User Profile",
             }}
           />
-          <div className="ml-auto flex gap-3">
-            <div className="w-[1px] bg-gray-100 mx-3" />
+          <div className="ml-auto flex gap-3 items-center">
+            <Separator
+              orientation="vertical"
+              className="mr-1 md:mr-2 data-[orientation=vertical]:h-6"
+            />
             <LogoutButton className="ml-auto cursor-pointer" />
           </div>
         </header>
