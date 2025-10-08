@@ -133,7 +133,7 @@ export default function NoteDetail() {
           <Input
             value={note.title}
             onChange={(e) => handleTitleChange(e.target.value)}
-            className="text-xl font-semibold h-auto py-1 max-w-sm"
+            className="font-bold py-1 max-w-sm h-auto"
             placeholder="Untitled Note"
           />
         </div>

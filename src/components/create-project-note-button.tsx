@@ -1,12 +1,14 @@
 "use client";
 import useCreate from "@/hooks/use-create";
-import { createNoteInProject } from "@/lib/notes";
+import { createNoteInProject, InsertNotePayload } from "@/lib/notes";
 import { useRouter } from "next/navigation";
-import { Button, ButtonProps } from "./ui/button";
+import { Button } from "./ui/button";
+import { ButtonHTMLAttributes } from "react";
 import { Spinner } from "./ui/spinner";
 import Icon from "./ui/icons";
 
-interface CreateProjectNoteButtonProps extends ButtonProps {
+interface CreateProjectNoteButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
   projectSlug: string;
   redirectToNote?: boolean;
   onSuccess?: (noteId: string) => void;
@@ -20,8 +22,8 @@ export default function CreateProjectNoteButton({
   ...props
 }: CreateProjectNoteButtonProps) {
   const { push } = useRouter();
-  const { createRecord, isLoading: isCreating } = useCreate((data) =>
-    createNoteInProject(data, projectSlug)
+  const { createRecord, isLoading: isCreating } = useCreate(
+    (data: InsertNotePayload) => createNoteInProject(data, projectSlug)
   );
 
   async function handleCreate() {

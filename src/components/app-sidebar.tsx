@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 
 import {
@@ -7,21 +9,22 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { Text } from "./ui/text";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { UserProfile } from "@/lib/auth";
+import useRecentActivity from "@/hooks/use-recent-activity";
+import { RecentActivityList } from "./recent-activity-list";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user_profile?: UserProfile;
 }
 
 export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
+  const { recentActivity, isLoading } = useRecentActivity();
+
   return (
     <Sidebar {...props}>
       <SidebarHeader className="py-3 md:py-4">
@@ -37,18 +40,12 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupLabel>Recent Activity</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/profile">This is a note title...</Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/profile">This is another note...</Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            <RecentActivityList
+              items={recentActivity}
+              isLoading={isLoading}
+              title="Activity"
+              maxItems={6}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
@@ -56,18 +53,13 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
             <Link href="/projects">Projects</Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/profile">Sim Racing</Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/profile">Blender</Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            <RecentActivityList
+              items={recentActivity}
+              isLoading={isLoading}
+              title="Projects"
+              maxItems={6}
+              type="project"
+            />
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
@@ -75,18 +67,13 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
             <Link href="/notes">Notes</Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/profile">Sim Racing</Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/profile">Blender</Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            <RecentActivityList
+              items={recentActivity}
+              isLoading={isLoading}
+              title="Notes"
+              maxItems={6}
+              type="note"
+            />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

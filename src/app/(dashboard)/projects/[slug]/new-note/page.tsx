@@ -68,10 +68,10 @@ export default function NewProjectNotePage() {
       </div>
 
       <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-lg">
-        <Text variant="lead" className="mb-6 text-center">
+        <Text className="mb-6 text-center">
           Click the button below to create a new note in this project
         </Text>
-        <CreateProjectNoteButton projectSlug={projectSlug} size="lg">
+        <CreateProjectNoteButton projectSlug={projectSlug}>
           Create Note
         </CreateProjectNoteButton>
       </div>
