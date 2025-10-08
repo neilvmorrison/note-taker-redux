@@ -31,7 +31,7 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
         <Text
           component="h1"
           asChild
-          className="text-lg md:text-xl font-semibold"
+          className="text-lg md:text-xl font-semibold ml-3"
         >
           <Link href="/">Duley Noted</Link>
         </Text>
@@ -69,6 +69,20 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
           <SidebarGroupContent>
             <RecentActivityList
               items={recentActivity}
+              isLoading={isLoading}
+              title="Notes"
+              maxItems={6}
+              type="note"
+            />
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel asChild>
+            <Link href="/tasks">Tasks</Link>
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <RecentActivityList
+              items={null}
               isLoading={isLoading}
               title="Notes"
               maxItems={6}

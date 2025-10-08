@@ -13,7 +13,7 @@ export type ActivityItem = {
   updatedAt: string | null;
 };
 
-export default function useRecentActivity(limit: number = 6) {
+export default function useRecentActivity(limit: number = 4) {
   const [isLoading, setLoading] = useState(false);
   const [recentNotes, setRecentNotes] = useState<Note[] | null>(null);
   const [recentProjects, setRecentProjects] = useState<Project[] | null>(null);
@@ -41,7 +41,7 @@ export default function useRecentActivity(limit: number = 6) {
           ...notes.map(
             (note): ActivityItem => ({
               id: note.id,
-              title: note.title,
+              title: note.title ?? "",
               type: "note",
               url: `/notes/${note.id}`,
               createdAt: note.created_at,

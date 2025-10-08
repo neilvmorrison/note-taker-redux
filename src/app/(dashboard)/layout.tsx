@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import BreadcrumbNav from "@/components/breadcrumb-nav";
 import LogoutButton from "@/components/logout-button";
-import { Button } from "@/components/ui/button";
+import IconButton from "@/components/ui/icon-button";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -40,7 +40,6 @@ export default async function DashboardLayout({
             }}
           />
           <div className="ml-auto flex gap-3">
-            <Button>Recent Activity</Button>
             <div className="w-[1px] bg-gray-100 mx-3" />
             <LogoutButton className="ml-auto cursor-pointer" />
           </div>

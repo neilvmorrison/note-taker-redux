@@ -6,6 +6,8 @@ import * as Fi from "react-icons/fi";
 import * as Hi from "react-icons/hi";
 import * as Md from "react-icons/md";
 import * as Fa from "react-icons/fa";
+import * as Cg from "react-icons/cg";
+
 import { IconBaseProps } from "react-icons/lib";
 
 import { cn } from "@/lib/utils";
@@ -24,7 +26,10 @@ export type IconNames =
   | "dark_mode"
   | "light_mode"
   | "user"
-  | "alert";
+  | "alert"
+  | "chevron_left"
+  | "chevron_right"
+  | "feed";
 
 interface BaseIconProps {
   name: IconNames;
@@ -83,6 +88,12 @@ export default function Icon({
         return Fa.FaUser;
       case "alert":
         return BiError;
+      case "chevron_left":
+        return Fa.FaChevronLeft;
+      case "chevron_right":
+        return Fa.FaChevronRight;
+      case "feed":
+        return Cg.CgFeed;
 
       default:
         console.warn(`Icon ${name} not found`);
