@@ -226,7 +226,10 @@ export function TiptapEditor({
       autofocus,
       editable,
       onUpdate: ({ editor }) => {
-        onChange(editor.getHTML());
+        const html = editor.getHTML();
+        if (html !== content) {
+          onChange(html);
+        }
       },
       onBlur: () => {
         setIsFocused(false);
@@ -249,20 +252,31 @@ export function TiptapEditor({
     }
   }, [editor, content]);
 
-  // Force editor to apply styles immediately when format changes
+  // Optimize format change handling to avoid jankiness
   useEffect(() => {
     if (!editor) return;
 
-    // Add a transaction handler to ensure styles are applied immediately
-    const updateHandler = () => {
-      // Force a DOM update by adding a class and removing it
-      const editorElement = document.querySelector(".ProseMirror");
-      if (editorElement) {
-        editorElement.classList.add("format-changed");
-        setTimeout(() => {
-          editorElement.classList.remove("format-changed");
-        }, 10);
+    // Add a transaction handler to ensure styles are applied immediately,
+    // but only for transactions that involve formatting changes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateHandler = ({ transaction }: { transaction: any }) => {
+      if (!transaction.docChanged) {
+        return; // Skip DOM manipulation for selection-only changes
       }
+
+      // Use RAF for smoother rendering
+      requestAnimationFrame(() => {
+        const editorElement = document.querySelector(".ProseMirror");
+        if (editorElement) {
+          // We're now more selective about when to force style refresh
+          if (transaction.getMeta("formatting")) {
+            editorElement.classList.add("format-changed");
+            requestAnimationFrame(() => {
+              editorElement.classList.remove("format-changed");
+            });
+          }
+        }
+      });
     };
 
     editor.on("transaction", updateHandler);
@@ -280,34 +294,31 @@ export function TiptapEditor({
   }, []);
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div className={cn("flex flex-col relative", className)}>
       {isMounted && editor && (
         <>
-          {isFocused && (
-            <>
-              {isMobile ? (
-                <MobileEditorToolbar
-                  editor={editor}
-                  className={cn("transition-opacity", "opacity-100")}
-                />
-              ) : (
-                <EditorToolbar
-                  editor={editor}
-                  className={cn(
-                    "transition-opacity duration-200",
-                    "opacity-100"
-                  )}
-                />
-              )}
-            </>
-          )}
+          <div className={cn("sticky top-0 z-10", !isFocused && "hidden")}>
+            {isMobile ? (
+              <MobileEditorToolbar
+                editor={editor}
+                className={cn("transition-opacity", "opacity-100")}
+              />
+            ) : (
+              <EditorToolbar
+                editor={editor}
+                className={cn("transition-opacity duration-200", "opacity-100")}
+              />
+            )}
+          </div>
           <EditorContent
             editor={editor}
             className={cn(
               "prose dark:prose-invert max-w-none w-full",
               "rounded-md p-3 sm:p-5 min-h-[200px]",
-              isFocused ? "border border-primary" : "border-transparent",
-              "transition-colors duration-200",
+              // Use a consistent border to prevent layout shifts, just change color
+              "border",
+              isFocused ? "border-primary" : "border-muted",
+              "transition-colors duration-200 ease-in-out",
               "sm:text-base text-sm",
               "cursor-text outline-none",
               "editor-container" // Added custom class for styling
