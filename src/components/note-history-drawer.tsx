@@ -123,7 +123,7 @@ export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
                 className="flex items-start gap-4 border-b border-border pb-4 last:border-0"
               >
                 <Avatar>
-                  <AvatarImage src={""} />
+                  <AvatarImage src={action.actor?.avatar_url ?? ""} />
                   <AvatarFallback className="text-sm bg-blue-400 text-white">
                     {getInitials(
                       action.actor?.first_name ?? null,

@@ -14,6 +14,7 @@ export type NoteAction = Database["public"]["Tables"]["note_actions"]["Row"] & {
     first_name: string | null;
     last_name: string | null;
     email: string;
+    avatar_url: string | null;
   } | null;
 };
 export type NotesSearchParams = {
@@ -64,7 +65,10 @@ export async function updateNote(payload: UpdateNotePayload) {
   }
 
   const sb = await createClient();
-
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    throw new Error("User not found");
+  }
   const { data: updated_note, error } = await sb
     .from("notes")
     .update({ ...payload, updated_at: new Date().toISOString() })
@@ -73,6 +77,15 @@ export async function updateNote(payload: UpdateNotePayload) {
     .single();
 
   if (error) throw error;
+  if (updated_note) {
+    await sb.from("note_actions").insert({
+      previous_state: null,
+      updated_state: null,
+      event_type: note_event_types.updated,
+      note_id: updated_note.id,
+      actor_id: currentUser?.id,
+    });
+  }
   return updated_note;
 }
 
@@ -305,7 +318,8 @@ export async function getNoteActions(noteId: string) {
         id,
         first_name,
         last_name,
-        email
+        email,
+        avatar_url
       )
     `
     )

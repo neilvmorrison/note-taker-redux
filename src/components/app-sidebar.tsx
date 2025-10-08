@@ -97,7 +97,7 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
         href="/profile"
       >
         <Avatar className="w-8 h-8 md:w-10 md:h-10">
-          <AvatarImage src={"https://github.com/shadcn.png"} />
+          <AvatarImage src={user_profile?.avatar_url ?? ""} />
           <AvatarFallback className="text-sm">
             {user_profile?.first_name?.[0] || ""}
             {user_profile?.last_name?.[0] || ""}
@@ -105,7 +105,7 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
         </Avatar>
         <div className="overflow-hidden">
           <Text className="text-sm font-medium truncate">
-            {user_profile?.first_name}
+            {user_profile?.first_name} {user_profile?.last_name}
           </Text>
           <Text className="text-xs truncate" dimmed>
             {user_profile?.email}

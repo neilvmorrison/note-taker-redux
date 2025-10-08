@@ -27,18 +27,27 @@ export function useAutoSave<T>({
   const [lastChanged, setLastChanged] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Update lastChanged timestamp when data changes
+  // Handle initial data and subsequent updates
   useEffect(() => {
-    // Only mark as changed if the data is different from what was last saved
-    if (JSON.stringify(data) !== JSON.stringify(lastSaved)) {
+    if (isInitialLoad) {
+      // On initial load, just update lastSaved without marking as changed
+      setLastSaved(data);
+      setIsInitialLoad(false);
+    } else if (JSON.stringify(data) !== JSON.stringify(lastSaved)) {
+      // Only mark as changed after initial load and if data differs
       setLastChanged(Date.now());
     }
-  }, [data, lastSaved]);
+  }, [data, lastSaved, isInitialLoad]);
 
   // The save function to be called
   const save = useCallback(async () => {
-    if (!lastChanged || JSON.stringify(data) === JSON.stringify(lastSaved)) {
+    if (
+      isInitialLoad ||
+      !lastChanged ||
+      JSON.stringify(data) === JSON.stringify(lastSaved)
+    ) {
       return;
     }
 
@@ -53,7 +62,7 @@ export function useAutoSave<T>({
     } finally {
       setIsSaving(false);
     }
-  }, [data, lastChanged, lastSaved, onSave]);
+  }, [data, lastChanged, lastSaved, onSave, isInitialLoad]);
 
   // Set up the interval to check for pending saves
   useEffect(() => {
@@ -68,15 +77,15 @@ export function useAutoSave<T>({
 
   // Function to force a save immediately
   const forceSave = useCallback(async () => {
-    if (JSON.stringify(data) !== JSON.stringify(lastSaved)) {
+    if (!isInitialLoad && JSON.stringify(data) !== JSON.stringify(lastSaved)) {
       await save();
     }
-  }, [data, lastSaved, save]);
+  }, [data, lastSaved, save, isInitialLoad]);
 
   return {
     isSaving,
     error,
     forceSave,
-    hasPendingChanges: lastChanged !== null,
+    hasPendingChanges: !isInitialLoad && lastChanged !== null,
   };
 }
