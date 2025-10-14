@@ -146,7 +146,7 @@ export default function NoteDetail() {
             placeholder="Untitled Note"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="block md:flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center">
@@ -160,7 +160,7 @@ export default function NoteDetail() {
               <p>Assign this note to a project</p>
             </TooltipContent>
           </Tooltip>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-2 md:mt-0">
             <NoteHistoryDrawer noteId={note.id} />
             <Button
               variant="outline"
