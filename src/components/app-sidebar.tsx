@@ -90,6 +90,20 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
             />
           </SidebarGroupContent>
         </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel asChild>
+            <Link href="/chats">Chats</Link>
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <RecentActivityList
+              items={null}
+              isLoading={isLoading}
+              title="Notes"
+              maxItems={6}
+              type="note"
+            />
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
       <Link
