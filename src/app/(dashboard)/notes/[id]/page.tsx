@@ -131,8 +131,8 @@ export default function NoteDetail() {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <div className="flex items-center justify-between sticky top-0 bg-background z-10 py-2">
-        <div className="flex items-center gap-3">
+      <div className="blocklg:flex items-center justify-between sticky top-0 bg-background z-10 py-2">
+        <div className="flex items-center gap-3 mb-3 lg:mb-0">
           <Button variant="outline" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
