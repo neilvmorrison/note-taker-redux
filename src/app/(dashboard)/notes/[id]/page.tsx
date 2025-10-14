@@ -185,7 +185,7 @@ export default function NoteDetail() {
         </Alert>
       )}
 
-      <div className="flex-grow lg:max-w-[768px] border-0 shadow-none">
+      <div className="flex-grow max-w-full lg:max-w-[768px] border-0 shadow-none">
         <TiptapEditor
           content={note.content}
           onChange={handleContentChange}
