@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { History } from "lucide-react";
 import { useNoteHistory } from "@/hooks/use-note-history";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,7 +24,6 @@ import {
 import { Text } from "@/components/ui/text";
 import clsx from "clsx";
 import useToggle from "@/hooks/use-toggle";
-import { Separator } from "./ui/separator";
 
 interface NoteHistoryDrawerProps {
   noteId: string;
@@ -32,7 +31,8 @@ interface NoteHistoryDrawerProps {
 
 export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showDiff, toggleDiff] = useToggle(true);
+  const [showDiff, toggleDiff] = useToggle(false);
+  const [activeDiff, setActiveDiff] = useState(null);
   const { loading, error, actions } = useNoteHistory(isOpen ? noteId : null);
 
   // Function to properly parse database timestamps
@@ -88,6 +88,10 @@ export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
     }
     return "U";
   };
+
+  const diff = useMemo(() => {
+    return actions.find((act) => act.id === activeDiff);
+  }, [activeDiff, actions]);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -176,7 +180,10 @@ export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
                         <Button
                           className="text-blue-500 text-xs p-0"
                           variant="link"
-                          onClick={toggleDiff}
+                          onClick={() => {
+                            setActiveDiff(action.id);
+                            if (!showDiff) toggleDiff();
+                          }}
                         >
                           View Diff
                         </Button>
@@ -186,7 +193,15 @@ export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
                 ))}
               </div>
             </div>
-            {showDiff && <div>This is The diff</div>}
+            {showDiff && (
+              <div className="grid grid-cols-2 gap-8 w-full">
+                <div>
+                  Previous State
+                  <div>{diff?.previous_state}</div>
+                </div>
+                <div>{diff?.updated_state}</div>
+              </div>
+            )}
           </div>
         </div>
       </SheetContent>
