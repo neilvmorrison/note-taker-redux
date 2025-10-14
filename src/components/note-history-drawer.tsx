@@ -32,7 +32,7 @@ interface NoteHistoryDrawerProps {
 export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showDiff, toggleDiff] = useToggle(false);
-  const [activeDiff, setActiveDiff] = useState(null);
+  const [activeDiff, setActiveDiff] = useState("");
   const { loading, error, actions } = useNoteHistory(isOpen ? noteId : null);
 
   // Function to properly parse database timestamps
