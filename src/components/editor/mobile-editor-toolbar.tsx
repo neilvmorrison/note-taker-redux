@@ -28,13 +28,28 @@ import { Input } from "../ui/input";
 interface MobileEditorToolbarProps {
   editor: Editor;
   className?: string;
+  onInteraction?: (active: boolean) => void;
 }
 
 export default function MobileEditorToolbar({
   editor,
   className,
+  onInteraction,
 }: MobileEditorToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
+
+  // Create a wrapper function for handling mouse events
+  const handleMouseEnter = () => {
+    if (onInteraction) {
+      onInteraction(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (onInteraction) {
+      onInteraction(false);
+    }
+  };
 
   // Toggle button classes based on active state
   const buttonVariant = (active: boolean) => (active ? "default" : "outline");
@@ -64,6 +79,10 @@ export default function MobileEditorToolbar({
         "flex items-center justify-between gap-1 p-1.5 mb-2 rounded-md bg-background sticky top-1 z-10 border shadow-sm",
         className
       )}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={() => onInteraction && onInteraction(true)}
+      onClick={() => onInteraction && onInteraction(true)}
     >
       {/* Primary toolbar - always visible */}
       <div className="flex overflow-x-auto scrollbar-hide gap-1 py-0.5">
@@ -134,7 +153,7 @@ export default function MobileEditorToolbar({
       </div>
 
       {/* More options in a sheet */}
-      <Sheet>
+      <Sheet onOpenChange={(open) => onInteraction && onInteraction(open)}>
         <SheetTrigger asChild>
           <Button
             variant="outline"

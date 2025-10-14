@@ -26,14 +26,29 @@ import { Input } from "../ui/input";
 interface EditorToolbarProps {
   editor: Editor;
   className?: string;
+  onInteraction?: (active: boolean) => void;
 }
 
 export default function EditorToolbar({
   editor,
   className,
+  onInteraction,
 }: EditorToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [showLinkInput, setShowLinkInput] = useState(false);
+
+  // Create a wrapper function for handling mouse events
+  const handleMouseEnter = () => {
+    if (onInteraction) {
+      onInteraction(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (onInteraction) {
+      onInteraction(false);
+    }
+  };
 
   // Toggle button classes based on active state
   const buttonVariant = (active: boolean) => (active ? "default" : "outline");
@@ -64,6 +79,10 @@ export default function EditorToolbar({
         "flex flex-wrap gap-1 p-1 mb-2 border rounded-md bg-background shadow-sm",
         className
       )}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={() => onInteraction && onInteraction(true)}
+      onClick={() => onInteraction && onInteraction(true)}
     >
       <div className="flex flex-wrap gap-1">
         {/* Text formatting */}
