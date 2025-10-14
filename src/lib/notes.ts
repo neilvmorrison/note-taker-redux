@@ -69,18 +69,26 @@ export async function updateNote(payload: UpdateNotePayload) {
   if (!currentUser) {
     throw new Error("User not found");
   }
+  const { data: previousState, error: fetchError } = await sb
+    .from("notes")
+    .select("*")
+    .eq("id", payload.id)
+    .single();
+
+  if (fetchError) throw fetchError;
+  if (!previousState) throw new Error("Note not found");
   const { data: updated_note, error } = await sb
     .from("notes")
     .update({ ...payload, updated_at: new Date().toISOString() })
-    .eq("id", payload.id) // Add WHERE clause to specify which note to update
+    .eq("id", payload.id)
     .select("*")
     .single();
 
   if (error) throw error;
   if (updated_note) {
     await sb.from("note_actions").insert({
-      previous_state: null,
-      updated_state: null,
+      previous_state: JSON.stringify(previousState),
+      updated_state: JSON.stringify(updated_note),
       event_type: note_event_types.updated,
       note_id: updated_note.id,
       actor_id: currentUser?.id,

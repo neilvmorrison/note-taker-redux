@@ -146,7 +146,7 @@ export default function NoteDetail() {
             placeholder="Untitled Note"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="block md:flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center">
@@ -160,7 +160,7 @@ export default function NoteDetail() {
               <p>Assign this note to a project</p>
             </TooltipContent>
           </Tooltip>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-2 md:mt-0">
             <NoteHistoryDrawer noteId={note.id} />
             <Button
               variant="outline"
@@ -185,7 +185,7 @@ export default function NoteDetail() {
         </Alert>
       )}
 
-      <div className="flex-grow lg:max-w-[768px] border-0 shadow-none">
+      <div className="flex-grow max-w-full lg:max-w-[768px] border-0 shadow-none">
         <TiptapEditor
           content={note.content}
           onChange={handleContentChange}

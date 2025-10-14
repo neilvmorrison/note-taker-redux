@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { History } from "lucide-react";
 import { useNoteHistory } from "@/hooks/use-note-history";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,6 +22,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Text } from "@/components/ui/text";
+import clsx from "clsx";
+import useToggle from "@/hooks/use-toggle";
 
 interface NoteHistoryDrawerProps {
   noteId: string;
@@ -29,6 +31,8 @@ interface NoteHistoryDrawerProps {
 
 export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showDiff, toggleDiff] = useToggle(false);
+  const [activeDiff, setActiveDiff] = useState("");
   const { loading, error, actions } = useNoteHistory(isOpen ? noteId : null);
 
   // Function to properly parse database timestamps
@@ -85,6 +89,10 @@ export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
     return "U";
   };
 
+  const diff = useMemo(() => {
+    return actions.find((act) => act.id === activeDiff);
+  }, [activeDiff, actions]);
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
@@ -92,7 +100,13 @@ export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
           <History className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md md:max-w-lg" side="right">
+      <SheetContent
+        className={clsx(
+          "w-full md:max-w-sm transition-all",
+          showDiff && "md:max-w-full"
+        )}
+        side="right"
+      >
         <SheetHeader className="border-b pb-4">
           <SheetTitle>Note History</SheetTitle>
         </SheetHeader>
@@ -115,51 +129,79 @@ export function NoteHistoryDrawer({ noteId }: NoteHistoryDrawerProps) {
               <p>No history records found for this note.</p>
             </div>
           )}
-
-          <div className="space-y-4 pl-3">
-            {actions.map((action) => (
-              <div
-                key={action.id}
-                className="flex items-start gap-4 border-b border-border pb-4 last:border-0"
-              >
-                <Avatar>
-                  <AvatarImage src={action.actor?.avatar_url ?? ""} />
-                  <AvatarFallback className="text-sm bg-blue-400 text-white">
-                    {getInitials(
-                      action.actor?.first_name ?? null,
-                      action.actor?.last_name ?? null
-                    )}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex justify-between items-center">
-                    <Text>
-                      {action.actor?.first_name} {action.actor?.last_name}
-                    </Text>
-                    {action.created_at && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <time className="text-xs text-muted-foreground hover:underline cursor-default">
-                            {formatDistanceToNow(
-                              parseTimestamp(action.created_at),
-                              {
-                                addSuffix: true,
-                              }
-                            )}
-                          </time>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {format(parseTimestamp(action.created_at), "PPpp")}
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
+          <div className="flex gap-16">
+            <div className="md:w-sm ">
+              <div className="space-y-4 pl-3">
+                {actions.map((action) => (
+                  <div
+                    key={action.id}
+                    className="flex items-start gap-4 border-b border-border pb-4 last:border-0"
+                  >
+                    <Avatar>
+                      <AvatarImage src={action.actor?.avatar_url ?? ""} />
+                      <AvatarFallback className="text-sm bg-blue-400 text-white">
+                        {getInitials(
+                          action.actor?.first_name ?? null,
+                          action.actor?.last_name ?? null
+                        )}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <Text>
+                          {action.actor?.first_name} {action.actor?.last_name}
+                        </Text>
+                        {action.created_at && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <time className="text-xs text-muted-foreground hover:underline cursor-default">
+                                {formatDistanceToNow(
+                                  parseTimestamp(action.created_at),
+                                  {
+                                    addSuffix: true,
+                                  }
+                                )}
+                              </time>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {format(
+                                parseTimestamp(action.created_at),
+                                "PPpp"
+                              )}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-x-2 mt-[-12px]">
+                        <Text dimmed className="text-xs">
+                          {getActionDescription(action.event_type)}
+                        </Text>
+                        &middot;
+                        <Button
+                          className="text-blue-500 text-xs p-0"
+                          variant="link"
+                          onClick={() => {
+                            setActiveDiff(action.id);
+                            if (!showDiff) toggleDiff();
+                          }}
+                        >
+                          View Diff
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <Text dimmed className="text-xs">
-                    {getActionDescription(action.event_type)}
-                  </Text>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+            {showDiff && (
+              <div className="grid grid-cols-2 gap-8 w-full">
+                <div>
+                  Previous State
+                  <div>{diff?.previous_state}</div>
+                </div>
+                <div>{diff?.updated_state}</div>
+              </div>
+            )}
           </div>
         </div>
       </SheetContent>
