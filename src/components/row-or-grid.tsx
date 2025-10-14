@@ -38,6 +38,10 @@ export default function RowOrGrid<T>({
     return <LoadingState />;
   }
 
+  if (!isLoading && !items.length && emptyState) {
+    return emptyState;
+  }
+
   if (orientation === "grid") {
     return (
       <div className={gridClassName}>

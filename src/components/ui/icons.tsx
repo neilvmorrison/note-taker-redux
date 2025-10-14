@@ -7,6 +7,7 @@ import * as Hi from "react-icons/hi";
 import * as Md from "react-icons/md";
 import * as Fa from "react-icons/fa";
 import * as Cg from "react-icons/cg";
+import * as Pi from "react-icons/pi";
 
 import { IconBaseProps } from "react-icons/lib";
 
@@ -29,7 +30,8 @@ export type IconNames =
   | "alert"
   | "chevron_left"
   | "chevron_right"
-  | "feed";
+  | "feed"
+  | "logo";
 
 interface BaseIconProps {
   name: IconNames;
@@ -94,6 +96,8 @@ export default function Icon({
         return Fa.FaChevronRight;
       case "feed":
         return Cg.CgFeed;
+      case "logo":
+        return Pi.PiNotebook;
 
       default:
         console.warn(`Icon ${name} not found`);
@@ -103,7 +107,6 @@ export default function Icon({
 
   const IconComponent = getIconComponent();
 
-  // For use in components like Alert that expect direct SVG children
   if (asChild) {
     return (
       <IconComponent
@@ -114,7 +117,6 @@ export default function Icon({
     );
   }
 
-  // Standard usage with wrapper div
   return (
     <div
       className={cn("inline-flex", className)}

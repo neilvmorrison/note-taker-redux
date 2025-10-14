@@ -6,13 +6,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Icon from "@/components/ui/icons";
 import { app_name } from "@/constants";
 
 export default function Authentication() {
   return (
     <div className="h-screen w-full flex items-center justify-center">
       <div>
-        <h1 className="text-center text-2xl font-bold mb-12">{app_name}</h1>
+        <div className="flex justify-center items-center gap-3 mb-12">
+          <Icon name="logo" />
+          <h1 className="text-center text-2xl font-bold">{app_name}</h1>
+        </div>
         <Card className="w-[360px]">
           <CardHeader>
             <CardTitle>Login</CardTitle>

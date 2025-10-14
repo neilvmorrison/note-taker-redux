@@ -36,9 +36,11 @@ export default async function DashboardLayout({
               notes: "Notes",
               projects: "Projects",
               profile: "User Profile",
+              tasks: "Tasks",
+              chats: "Chats",
             }}
           />
-          <div className="ml-auto flex gap-3 items-center">
+          <div className="ml-auto hidden gap-3 items-center lg:flex">
             <Separator
               orientation="vertical"
               className="mr-1 md:mr-2 data-[orientation=vertical]:h-6"

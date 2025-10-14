@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Save, ArrowLeft } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
 import { ProjectNoteSelector } from "@/components/project-note-selector";
 import { NoteHistoryDrawer } from "@/components/note-history-drawer";
 import {
@@ -17,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Icon from "@/components/ui/icons";
 
 export default function NoteDetail() {
   const { id } = useParams();
@@ -131,29 +131,22 @@ export default function NoteDetail() {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <div className="flex items-center justify-between sticky top-0 bg-background z-10 py-2">
-        <div className="flex items-center gap-3">
+      <div className="block lg:flex items-center justify-between sticky top-0 bg-background z-10 py-2">
+        <div className="flex items-center gap-3 mb-3 lg:mb-0">
           <Button variant="outline" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
+          {hasPendingChanges && (
+            <Icon name="alert" className="text-amber-500" />
+          )}
           <Input
             value={note.title}
             onChange={(e) => handleTitleChange(e.target.value)}
-            className="font-bold py-1 max-w-sm h-auto"
+            className="font-bold py-1 max-w-sm h-auto border-none focus:border"
             placeholder="Untitled Note"
           />
         </div>
         <div className="flex items-center gap-2">
-          {(isSaving || hasPendingChanges) && (
-            <span
-              className={cn(
-                "text-xs",
-                isSaving ? "text-muted-foreground" : "text-amber-500"
-              )}
-            >
-              {isSaving ? "Saving..." : "Unsaved changes"}
-            </span>
-          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center">

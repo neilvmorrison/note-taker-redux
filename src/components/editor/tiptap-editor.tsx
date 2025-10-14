@@ -177,6 +177,12 @@ export function TiptapEditor({
   }, []);
   const { isMobile } = useMobile();
   const [isFocused, setIsFocused] = useState(false);
+  const [isToolbarActive, setIsToolbarActive] = useState(false);
+
+  // Function to handle toolbar interaction
+  const handleToolbarInteraction = (active: boolean) => {
+    setIsToolbarActive(active);
+  };
 
   const editor = useEditor(
     {
@@ -297,16 +303,23 @@ export function TiptapEditor({
     <div className={cn("flex flex-col relative", className)}>
       {isMounted && editor && (
         <>
-          <div className={cn("sticky top-0 z-10", !isFocused && "hidden")}>
+          <div
+            className={cn(
+              "sticky top-0 z-10",
+              !isFocused && !isToolbarActive && "hidden"
+            )}
+          >
             {isMobile ? (
               <MobileEditorToolbar
                 editor={editor}
                 className={cn("transition-opacity", "opacity-100")}
+                onInteraction={handleToolbarInteraction}
               />
             ) : (
               <EditorToolbar
                 editor={editor}
                 className={cn("transition-opacity duration-200", "opacity-100")}
+                onInteraction={handleToolbarInteraction}
               />
             )}
           </div>
