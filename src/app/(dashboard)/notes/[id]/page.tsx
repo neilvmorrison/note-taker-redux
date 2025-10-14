@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Save, ArrowLeft } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
 import { ProjectNoteSelector } from "@/components/project-note-selector";
 import { NoteHistoryDrawer } from "@/components/note-history-drawer";
 import {
