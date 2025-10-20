@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { UserProfile } from "@/lib/auth";
 import useRecentActivity from "@/hooks/use-recent-activity";
 import { RecentActivityList } from "./recent-activity-list";
+import Logo from "./logo";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user_profile?: UserProfile;
@@ -28,13 +29,7 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
   return (
     <Sidebar {...props}>
       <SidebarHeader className="py-3 md:py-4">
-        <Text
-          component="h1"
-          asChild
-          className="text-lg md:text-xl font-semibold ml-3"
-        >
-          <Link href="/">Duley Noted</Link>
-        </Text>
+        <Logo asLink />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

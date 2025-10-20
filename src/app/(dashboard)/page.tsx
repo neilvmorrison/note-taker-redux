@@ -1,3 +1,4 @@
+"use client";
 import ChatInit from "@/components/chat-init";
 import { Text } from "@/components/ui/text";
 

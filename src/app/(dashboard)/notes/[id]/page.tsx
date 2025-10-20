@@ -110,7 +110,7 @@ export default function NoteDetail() {
     if (hasPendingChanges) {
       await forceSave();
     }
-    router.push("/notes");
+    router.back();
   };
 
   if (loading) {
