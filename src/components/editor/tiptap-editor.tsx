@@ -19,11 +19,13 @@ import Code from "@tiptap/extension-code";
 import CodeBlock from "@tiptap/extension-code-block";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
+import Highlight from "@tiptap/extension-highlight";
 
 import EditorToolbar from "./editor-toolbar";
 import MobileEditorToolbar from "./mobile-editor-toolbar";
 import { cn } from "@/lib/utils";
 import { useMobile } from "@/hooks/use-mobile";
+import BubbleMenu from "./bubble-menu";
 
 export interface TiptapEditorProps {
   content: string;
@@ -205,6 +207,9 @@ export function TiptapEditor({
         Strike,
         Code,
         CodeBlock,
+        Highlight.configure({
+          multicolor: true,
+        }),
         StarterKit.configure({
           document: false,
           paragraph: false,
@@ -244,14 +249,11 @@ export function TiptapEditor({
       onFocus: () => {
         setIsFocused(true);
       },
-      // Fix for SSR hydration mismatch
       immediatelyRender: false,
     },
-    // Only initialize editor on client-side
     []
   );
 
-  // Update content from props when it changes externally
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
       editor.commands.setContent(content);
@@ -309,6 +311,7 @@ export function TiptapEditor({
               !isFocused && !isToolbarActive && "hidden"
             )}
           >
+            <BubbleMenu editor={editor} />
             {isMobile ? (
               <MobileEditorToolbar
                 editor={editor}
