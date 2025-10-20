@@ -311,7 +311,7 @@ export function TiptapEditor({
               !isFocused && !isToolbarActive && "hidden"
             )}
           >
-            <BubbleMenu editor={editor} />
+            {/* <BubbleMenu editor={editor} /> */}
             {isMobile ? (
               <MobileEditorToolbar
                 editor={editor}
