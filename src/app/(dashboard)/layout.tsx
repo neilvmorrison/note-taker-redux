@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import BreadcrumbNav from "@/components/breadcrumb-nav";
 import LogoutButton from "@/components/logout-button";
+import SearchDialog from "@/components/search-dialog";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -40,6 +41,7 @@ export default async function DashboardLayout({
               chats: "Chats",
             }}
           />
+          <SearchDialog />
           <div className="ml-auto hidden gap-3 items-center lg:flex">
             <Separator
               orientation="vertical"
