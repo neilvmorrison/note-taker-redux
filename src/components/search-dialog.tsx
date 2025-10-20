@@ -10,10 +10,13 @@ import useToggle from "@/hooks/use-toggle";
 export default function SearchDialog() {
   const [showDialog, toggleDialog] = useToggle(false);
   useKeyboardShortcut({ key: "k", callback: toggleDialog });
+
   return (
     <Dialog open={showDialog} onOpenChange={toggleDialog}>
       <DialogTrigger asChild>
-        <Button>Cmd + K to Search</Button>
+        <Button variant="ghost" className="bg-gray-100 hover:bg-gray-200">
+          Cmd + K to Search
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Advanced Search</DialogTitle>

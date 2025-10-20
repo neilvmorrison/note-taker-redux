@@ -31,17 +31,19 @@ export default async function DashboardLayout({
             orientation="vertical"
             className="mr-1 md:mr-2 data-[orientation=vertical]:h-4"
           />
-          <BreadcrumbNav
-            className="text-sm md:text-base"
-            labels={{
-              notes: "Notes",
-              projects: "Projects",
-              profile: "User Profile",
-              tasks: "Tasks",
-              chats: "Chats",
-            }}
-          />
-          <SearchDialog />
+          <div className="flex items-center justify-between w-full">
+            <BreadcrumbNav
+              className="text-sm md:text-base"
+              labels={{
+                notes: "Notes",
+                projects: "Projects",
+                profile: "User Profile",
+                tasks: "Tasks",
+                chats: "Chats",
+              }}
+            />
+            <SearchDialog />
+          </div>
           <div className="ml-auto hidden gap-3 items-center lg:flex">
             <Separator
               orientation="vertical"
