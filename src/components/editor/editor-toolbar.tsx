@@ -20,22 +20,30 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Input } from "../ui/input";
+import { useFileUpload } from "@/hooks/use-file-upload";
+import { Spinner } from "@/components/ui/spinner";
 
 interface EditorToolbarProps {
   editor: Editor;
   className?: string;
   onInteraction?: (active: boolean) => void;
+  userId?: string;
+  noteId?: string;
 }
 
 export default function EditorToolbar({
   editor,
   className,
   onInteraction,
+  userId,
+  noteId,
 }: EditorToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [showLinkInput, setShowLinkInput] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadFile, isUploading, error: uploadError } = useFileUpload();
 
   // Create a wrapper function for handling mouse events
   const handleMouseEnter = () => {
@@ -65,12 +73,27 @@ export default function EditorToolbar({
     setShowLinkInput(false);
   };
 
-  // Handle adding an image from URL
-  const addImage = () => {
-    const url = window.prompt("Enter image URL");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+  // Handle adding an image from file upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+
+    try {
+      const result = await uploadFile(file, userId, noteId);
+      if (result.success && result.url) {
+        editor.chain().focus().setImage({ src: result.url }).run();
+      }
+    } catch (err) {
+      console.error("Failed to upload image:", err);
     }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const triggerImageUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -246,13 +269,26 @@ export default function EditorToolbar({
         )}
 
         {/* Image */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={handleImageUpload}
+          disabled={isUploading || !userId}
+        />
         <Button
           variant="outline"
           size="sm"
-          onClick={addImage}
-          title="Insert Image"
+          onClick={triggerImageUpload}
+          title={userId ? "Upload Image" : "Login required to upload images"}
+          disabled={isUploading || !userId}
         >
-          <ImageIcon className="h-4 w-4" />
+          {isUploading ? (
+            <Spinner className="h-4 w-4" />
+          ) : (
+            <ImageIcon className="h-4 w-4" />
+          )}
         </Button>
 
         <Separator orientation="vertical" className="h-8" />

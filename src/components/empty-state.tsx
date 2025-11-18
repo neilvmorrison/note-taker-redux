@@ -16,15 +16,17 @@ export default function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center p-8 gap-4 border border-dashed rounded-lg">
+    <div className="flex flex-col items-center justify-center p-8 gap-2 border border-dashed rounded-lg">
       <Icon
         name={icon as IconNames}
         className="h-12 w-12 text-muted-foreground"
       />
-      <Text component="h2" variant="h2">
-        {title}
-      </Text>
-      <Text>{description}</Text>
+      <div className="flex flex-col items-center justify-center">
+        <Text component="h2" variant="h2">
+          {title}
+        </Text>
+        <Text className="text-gray-400">{description}</Text>
+      </div>
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

@@ -1006,6 +1006,50 @@ export type Database = {
           },
         ]
       }
+      user_uploads: {
+        Row: {
+          auth_user_id: string
+          created_at: string | null
+          file_size: number
+          filename: string
+          id: string
+          mime_type: string
+          note_id: string | null
+          storage_path: string
+          url: string
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string | null
+          file_size: number
+          filename: string
+          id?: string
+          mime_type: string
+          note_id?: string | null
+          storage_path: string
+          url: string
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string | null
+          file_size?: number
+          filename?: string
+          id?: string
+          mime_type?: string
+          note_id?: string | null
+          storage_path?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_uploads_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           auth_user_id: string | null

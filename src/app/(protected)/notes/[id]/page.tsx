@@ -17,18 +17,34 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Icon from "@/components/ui/icons";
+import { createClient } from "@/lib/supabase/client";
 
 export default function NoteDetail() {
   const { id } = useParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [note, setNote] = useState<{
     id: string;
     title: string;
     content: string;
     project_id: string | null;
   } | null>(null);
+
+  // Fetch current user
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Fetch note data
   useEffect(() => {
@@ -191,6 +207,8 @@ export default function NoteDetail() {
           onChange={handleContentChange}
           placeholder="Start writing your note..."
           className="min-h-[calc(100vh-250px)]"
+          userId={userId || undefined}
+          noteId={note.id}
         />
       </div>
     </div>
