@@ -35,6 +35,8 @@ export interface TiptapEditorProps {
   editable?: boolean;
   placeholder?: string;
   className?: string;
+  userId?: string;
+  noteId?: string;
 }
 
 export function TiptapEditor({
@@ -45,6 +47,8 @@ export function TiptapEditor({
   editable = true,
   placeholder = "Write something...",
   className,
+  userId,
+  noteId,
 }: TiptapEditorProps) {
   // Add custom CSS for ProseMirror editor to ensure full clickability
   useEffect(() => {
@@ -317,12 +321,16 @@ export function TiptapEditor({
                 editor={editor}
                 className={cn("transition-opacity", "opacity-100")}
                 onInteraction={handleToolbarInteraction}
+                userId={userId}
+                noteId={noteId}
               />
             ) : (
               <EditorToolbar
                 editor={editor}
                 className={cn("transition-opacity duration-200", "opacity-100")}
                 onInteraction={handleToolbarInteraction}
+                userId={userId}
+                noteId={noteId}
               />
             )}
           </div>

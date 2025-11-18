@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Sheet,
   SheetContent,
@@ -24,19 +24,27 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Input } from "../ui/input";
+import { useFileUpload } from "@/hooks/use-file-upload";
+import { Spinner } from "@/components/ui/spinner";
 
 interface MobileEditorToolbarProps {
   editor: Editor;
   className?: string;
   onInteraction?: (active: boolean) => void;
+  userId?: string;
+  noteId?: string;
 }
 
 export default function MobileEditorToolbar({
   editor,
   className,
   onInteraction,
+  userId,
+  noteId,
 }: MobileEditorToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadFile, isUploading, error: uploadError } = useFileUpload();
 
   // Create a wrapper function for handling mouse events
   const handleMouseEnter = () => {
@@ -65,12 +73,27 @@ export default function MobileEditorToolbar({
     setLinkUrl("");
   };
 
-  // Handle adding an image from URL
-  const addImage = () => {
-    const url = window.prompt("Enter image URL");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+  // Handle adding an image from file upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+
+    try {
+      const result = await uploadFile(file, userId, noteId);
+      if (result.success && result.url) {
+        editor.chain().focus().setImage({ src: result.url }).run();
+      }
+    } catch (err) {
+      console.error("Failed to upload image:", err);
     }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const triggerImageUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -233,12 +256,25 @@ export default function MobileEditorToolbar({
               <span className="text-xs">Heading</span>
             </Button>
 
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleImageUpload}
+              disabled={isUploading || !userId}
+            />
             <Button
               variant="outline"
-              onClick={addImage}
+              onClick={triggerImageUpload}
               className="flex flex-col gap-1 h-auto py-3"
+              disabled={isUploading || !userId}
             >
-              <ImageIcon className="h-5 w-5" />
+              {isUploading ? (
+                <Spinner className="h-5 w-5" />
+              ) : (
+                <ImageIcon className="h-5 w-5" />
+              )}
               <span className="text-xs">Image</span>
             </Button>
           </div>

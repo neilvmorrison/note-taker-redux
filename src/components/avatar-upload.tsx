@@ -35,13 +35,11 @@ export function AvatarUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file type
     if (!file.type.startsWith("image/")) {
       setError("Please upload an image file");
       return;
     }
 
-    // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError("File size should be less than 5MB");
       return;
@@ -51,7 +49,7 @@ export function AvatarUpload({
     setError(null);
 
     try {
-      const result = await uploadAvatarFile(userId, file);
+      const result = await uploadAvatarFile(file);
 
       if (!result.success) {
         setError(result.error || "Failed to upload avatar");

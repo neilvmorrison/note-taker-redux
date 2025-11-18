@@ -11,18 +11,30 @@ export type UploadResult = {
 };
 
 export async function uploadAvatarFile(
-  userId: string,
   file: File
 ): Promise<UploadResult> {
   try {
     const supabase = await createClient();
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${userId}-${Date.now()}.${fileExt}`;
-    const filePath = `${userId}/${fileName}`;
+    
+    const { data: { user }, error: auth_error } = await supabase.auth.getUser();
+    
+    if (auth_error || !user) {
+      return { 
+        path: "", 
+        fullUrl: "", 
+        success: false, 
+        error: "User not authenticated" 
+      };
+    }
+    
+    const user_id = user.id;
+    const file_ext = file.name.split(".").pop();
+    const file_name = `${user_id}-${Date.now()}.${file_ext}`;
+    const file_path = `${user_id}/${file_name}`;
 
     const { data, error } = await supabase.storage
       .from(buckets.user_avatars)
-      .upload(filePath, file, {
+      .upload(file_path, file, {
         cacheControl: "3600",
         upsert: true,
       });
@@ -31,13 +43,13 @@ export async function uploadAvatarFile(
       return { path: "", fullUrl: "", success: false, error: error.message };
     }
 
-    const { data: urlData } = await supabase.storage
+    const { data: url_data } = await supabase.storage
       .from(buckets.user_avatars)
-      .getPublicUrl(filePath);
+      .getPublicUrl(file_path);
 
     return {
-      path: filePath,
-      fullUrl: urlData.publicUrl,
+      path: file_path,
+      fullUrl: url_data.publicUrl,
       success: true,
     };
   } catch (error) {
