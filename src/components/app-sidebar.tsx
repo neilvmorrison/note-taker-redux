@@ -18,6 +18,8 @@ import { UserProfile } from "@/lib/auth";
 import useRecentActivity from "@/hooks/use-recent-activity";
 import { RecentActivityList } from "./recent-activity-list";
 import Logo from "./logo";
+import { Button } from "./ui/button";
+import Icon from "./ui/icons";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user_profile?: UserProfile;
@@ -31,6 +33,12 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
       <SidebarHeader className="py-3 md:py-4">
         <Logo asLink />
       </SidebarHeader>
+      <Button className="mx-2" asChild>
+        <Link href="/chat">
+          <Icon name="ai" />
+          Chat
+        </Link>
+      </Button>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Recent Activity</SidebarGroupLabel>
