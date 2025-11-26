@@ -13,6 +13,7 @@ import {
 } from "@/lib/chats/chat-messages";
 import UserMessage from "@/components/messages/user-message";
 import AssistantMessage from "@/components/messages/assistant-message";
+import PromptInput from "@/components/prompt-input";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 
@@ -22,6 +23,9 @@ export default function ChatDetailPage() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const hasAutoTriggered = useRef(false);
+  const savedMessageIds = useRef<Set<string>>(new Set());
+
+  const [inputValue, setInputValue] = useState("");
 
   const {
     messages: chatMessages,
@@ -135,8 +139,91 @@ export default function ChatDetailPage() {
   const displayError = error || chatError?.message || null;
   const isLoading = status === "submitted" || status === "streaming";
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !inputValue.trim() ||
+      !chatId ||
+      typeof chatId !== "string" ||
+      isLoading
+    ) {
+      return;
+    }
+
+    const userMessageContent = inputValue.trim();
+    setInputValue("");
+
+    sendMessage({
+      role: "user",
+      parts: [
+        {
+          type: "text",
+          text: userMessageContent,
+        },
+      ],
+    });
+  };
+
+  useEffect(() => {
+    async function saveUserMessages() {
+      if (!chatId || typeof chatId !== "string" || isInitializing) return;
+
+      const unsavedUserMessages = chatMessages.filter(
+        (msg) =>
+          msg.role === "user" &&
+          msg.parts?.some((part) => part.type === "text") &&
+          !savedMessageIds.current.has(msg.id)
+      );
+
+      for (const message of unsavedUserMessages) {
+        const textPart = message.parts?.find(
+          (part): part is { type: "text"; text: string } => part.type === "text"
+        );
+        const content = textPart?.text || "";
+
+        if (content) {
+          try {
+            const existingMessage = await updateChatMessageByContextId(
+              message.id,
+              chatId,
+              {
+                chat_context_id: message.id,
+                content,
+              }
+            );
+
+            if (!existingMessage) {
+              await createChatMessage({
+                chat_id: chatId,
+                role: "user",
+                content,
+                chat_context_id: message.id,
+              });
+            }
+
+            savedMessageIds.current.add(message.id);
+          } catch (err) {
+            console.error("Failed to save user message:", err);
+          }
+        }
+      }
+    }
+
+    saveUserMessages();
+  }, [chatMessages, chatId, isInitializing]);
+
+  useEffect(() => {
+    if (!isInitializing) {
+      chatMessages.forEach((msg) => {
+        if (msg.role === "user" || msg.role === "assistant") {
+          savedMessageIds.current.add(msg.id);
+        }
+      });
+    }
+  }, [isInitializing, chatMessages]);
+
   return (
-    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
       <PageHeader
         title={userMessageText?.slice(0, 50) || "Chat"}
         description="Chat conversation"
@@ -144,7 +231,7 @@ export default function ChatDetailPage() {
           <Button onClick={() => router.push("/chat")}>New Chat</Button>
         }
       />
-      <div className="flex-1 px-4 py-6">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         {isInitializing ? (
           <div className="flex items-center justify-center h-full">
             <Spinner />
@@ -201,6 +288,19 @@ export default function ChatDetailPage() {
               )}
           </div>
         )}
+      </div>
+      <div className="border-t px-4 py-4">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+          <PromptInput
+            value={inputValue}
+            onChange={setInputValue}
+            placeholder="Type your message here..."
+            isSubmitting={isLoading}
+            classNames={{
+              textarea: "border-0 shadow-none",
+            }}
+          />
+        </form>
       </div>
     </div>
   );
