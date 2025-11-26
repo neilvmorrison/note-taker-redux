@@ -10,6 +10,7 @@ import { convertChatMessagesToUIMessages } from "@/lib/chats/utils";
 import {
   updateChatMessageByContextId,
   createChatMessage,
+  updateChatMessage,
 } from "@/lib/chats/chat-messages";
 import UserMessage from "@/components/messages/user-message";
 import AssistantMessage from "@/components/messages/assistant-message";
@@ -24,6 +25,9 @@ export default function ChatDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const hasAutoTriggered = useRef(false);
   const savedMessageIds = useRef<Set<string>>(new Set());
+  const persistedMessagesMap = useRef<
+    Map<string, { id: string; chat_context_id: string | null; content: string }>
+  >(new Map());
 
   const [inputValue, setInputValue] = useState("");
 
@@ -90,6 +94,24 @@ export default function ChatDetailPage() {
         setIsInitializing(true);
         setError(null);
         const persistedMessages = await getChatMessagesByChatId(chatId);
+
+        persistedMessagesMap.current.clear();
+        persistedMessages.forEach((msg) => {
+          const uiMessageId = msg.chat_context_id || msg.id;
+          persistedMessagesMap.current.set(uiMessageId, {
+            id: msg.id,
+            chat_context_id: msg.chat_context_id,
+            content: msg.content || "",
+          });
+          if (!msg.chat_context_id) {
+            persistedMessagesMap.current.set(msg.id, {
+              id: msg.id,
+              chat_context_id: msg.chat_context_id,
+              content: msg.content || "",
+            });
+          }
+        });
+
         const uiMessages = convertChatMessagesToUIMessages(persistedMessages);
         setMessages(uiMessages);
 
@@ -183,22 +205,57 @@ export default function ChatDetailPage() {
 
         if (content) {
           try {
-            const existingMessage = await updateChatMessageByContextId(
-              message.id,
-              chatId,
-              {
-                chat_context_id: message.id,
-                content,
-              }
-            );
+            let persistedMessage = persistedMessagesMap.current.get(message.id);
 
-            if (!existingMessage) {
-              await createChatMessage({
-                chat_id: chatId,
-                role: "user",
-                content,
+            if (!persistedMessage) {
+              for (const [
+                key,
+                value,
+              ] of persistedMessagesMap.current.entries()) {
+                if (
+                  !value.chat_context_id &&
+                  value.content === content &&
+                  key === value.id
+                ) {
+                  persistedMessage = value;
+                  break;
+                }
+              }
+            }
+
+            if (persistedMessage && !persistedMessage.chat_context_id) {
+              await updateChatMessage({
+                id: persistedMessage.id,
                 chat_context_id: message.id,
               });
+              persistedMessagesMap.current.set(message.id, {
+                id: persistedMessage.id,
+                chat_context_id: message.id,
+                content: persistedMessage.content,
+              });
+              persistedMessagesMap.current.set(persistedMessage.id, {
+                id: persistedMessage.id,
+                chat_context_id: message.id,
+                content: persistedMessage.content,
+              });
+            } else {
+              const existingMessage = await updateChatMessageByContextId(
+                message.id,
+                chatId,
+                {
+                  chat_context_id: message.id,
+                  content,
+                }
+              );
+
+              if (!existingMessage) {
+                await createChatMessage({
+                  chat_id: chatId,
+                  role: "user",
+                  content,
+                  chat_context_id: message.id,
+                });
+              }
             }
 
             savedMessageIds.current.add(message.id);
