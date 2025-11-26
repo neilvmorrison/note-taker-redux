@@ -11,7 +11,8 @@ create type "public"."chat_roles" as enum ('user', 'assistant');
     "role" public.chat_roles not null,
     "content" text,
     "embedding" public.vector,
-    "chat_id" uuid not null
+    "chat_id" uuid not null,
+    "chat_context_id" text
       );
 
 

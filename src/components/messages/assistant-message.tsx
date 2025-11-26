@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 interface AssistantMessageProps {
   content: string;
   created_at: string;
+  isStreaming?: boolean;
 }
 
-function AssistantMessage({ content, created_at }: AssistantMessageProps) {
+function AssistantMessage({ content, created_at, isStreaming }: AssistantMessageProps) {
   const parseTimestamp = (timestamp: string): Date => {
     if (!timestamp) return new Date();
     if (timestamp.includes("T")) {
@@ -36,7 +37,10 @@ function AssistantMessage({ content, created_at }: AssistantMessageProps) {
           "rounded-bl-sm"
         )}
       >
-        <p className="text-sm whitespace-pre-wrap break-words">{content}</p>
+        <p className="text-sm whitespace-pre-wrap break-words">
+          {content}
+          {isStreaming && <span className="inline-block w-2 h-4 ml-1 bg-foreground animate-pulse" />}
+        </p>
         <div className="flex justify-end mt-1">
           <span className="text-xs text-muted-foreground">{formattedTime}</span>
         </div>

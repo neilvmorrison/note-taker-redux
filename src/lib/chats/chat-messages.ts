@@ -74,3 +74,22 @@ export async function getChatMessagesByChatId(chat_id: string) {
   if (error) throw error;
   return messages;
 }
+
+export async function updateChatMessageByContextId(
+  chat_context_id: string,
+  chat_id: string,
+  payload: Partial<UpdateChatMessagePayload>
+) {
+  const sb = await createClient();
+
+  const { data: updated_message, error } = await sb
+    .from("chat_messages")
+    .update({ ...payload, updated_at: new Date().toISOString() })
+    .eq("chat_context_id", chat_context_id)
+    .eq("chat_id", chat_id)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return updated_message;
+}
