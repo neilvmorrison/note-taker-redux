@@ -347,7 +347,7 @@ export default function ChatDetailPage() {
         )}
       </div>
       <div className="border-t px-4 py-4">
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+        <form onSubmit={handleSubmit} className="mx-auto">
           <PromptInput
             value={inputValue}
             onChange={setInputValue}
