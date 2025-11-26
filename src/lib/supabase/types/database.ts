@@ -223,6 +223,7 @@ export type Database = {
           friendly_name: string | null
           id: string
           last_challenged_at: string | null
+          last_webauthn_challenge_data: Json | null
           phone: string | null
           secret: string | null
           status: Database["auth"]["Enums"]["factor_status"]
@@ -237,6 +238,7 @@ export type Database = {
           friendly_name?: string | null
           id: string
           last_challenged_at?: string | null
+          last_webauthn_challenge_data?: Json | null
           phone?: string | null
           secret?: string | null
           status: Database["auth"]["Enums"]["factor_status"]
@@ -251,6 +253,7 @@ export type Database = {
           friendly_name?: string | null
           id?: string
           last_challenged_at?: string | null
+          last_webauthn_challenge_data?: Json | null
           phone?: string | null
           secret?: string | null
           status?: Database["auth"]["Enums"]["factor_status"]
@@ -262,6 +265,171 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "mfa_factors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oauth_authorizations: {
+        Row: {
+          approved_at: string | null
+          authorization_code: string | null
+          authorization_id: string
+          client_id: string
+          code_challenge: string | null
+          code_challenge_method:
+            | Database["auth"]["Enums"]["code_challenge_method"]
+            | null
+          created_at: string
+          expires_at: string
+          id: string
+          redirect_uri: string
+          resource: string | null
+          response_type: Database["auth"]["Enums"]["oauth_response_type"]
+          scope: string
+          state: string | null
+          status: Database["auth"]["Enums"]["oauth_authorization_status"]
+          user_id: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          authorization_code?: string | null
+          authorization_id: string
+          client_id: string
+          code_challenge?: string | null
+          code_challenge_method?:
+            | Database["auth"]["Enums"]["code_challenge_method"]
+            | null
+          created_at?: string
+          expires_at?: string
+          id: string
+          redirect_uri: string
+          resource?: string | null
+          response_type?: Database["auth"]["Enums"]["oauth_response_type"]
+          scope: string
+          state?: string | null
+          status?: Database["auth"]["Enums"]["oauth_authorization_status"]
+          user_id?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          authorization_code?: string | null
+          authorization_id?: string
+          client_id?: string
+          code_challenge?: string | null
+          code_challenge_method?:
+            | Database["auth"]["Enums"]["code_challenge_method"]
+            | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          redirect_uri?: string
+          resource?: string | null
+          response_type?: Database["auth"]["Enums"]["oauth_response_type"]
+          scope?: string
+          state?: string | null
+          status?: Database["auth"]["Enums"]["oauth_authorization_status"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_authorizations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "oauth_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oauth_authorizations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oauth_clients: {
+        Row: {
+          client_name: string | null
+          client_secret_hash: string | null
+          client_type: Database["auth"]["Enums"]["oauth_client_type"]
+          client_uri: string | null
+          created_at: string
+          deleted_at: string | null
+          grant_types: string
+          id: string
+          logo_uri: string | null
+          redirect_uris: string
+          registration_type: Database["auth"]["Enums"]["oauth_registration_type"]
+          updated_at: string
+        }
+        Insert: {
+          client_name?: string | null
+          client_secret_hash?: string | null
+          client_type?: Database["auth"]["Enums"]["oauth_client_type"]
+          client_uri?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          grant_types: string
+          id: string
+          logo_uri?: string | null
+          redirect_uris: string
+          registration_type: Database["auth"]["Enums"]["oauth_registration_type"]
+          updated_at?: string
+        }
+        Update: {
+          client_name?: string | null
+          client_secret_hash?: string | null
+          client_type?: Database["auth"]["Enums"]["oauth_client_type"]
+          client_uri?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          grant_types?: string
+          id?: string
+          logo_uri?: string | null
+          redirect_uris?: string
+          registration_type?: Database["auth"]["Enums"]["oauth_registration_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oauth_consents: {
+        Row: {
+          client_id: string
+          granted_at: string
+          id: string
+          revoked_at: string | null
+          scopes: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          granted_at?: string
+          id: string
+          revoked_at?: string | null
+          scopes: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          granted_at?: string
+          id?: string
+          revoked_at?: string | null
+          scopes?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_consents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "oauth_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oauth_consents_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -461,8 +629,11 @@ export type Database = {
           created_at: string | null
           factor_id: string | null
           id: string
-          ip: unknown | null
+          ip: unknown
           not_after: string | null
+          oauth_client_id: string | null
+          refresh_token_counter: number | null
+          refresh_token_hmac_key: string | null
           refreshed_at: string | null
           tag: string | null
           updated_at: string | null
@@ -474,8 +645,11 @@ export type Database = {
           created_at?: string | null
           factor_id?: string | null
           id: string
-          ip?: unknown | null
+          ip?: unknown
           not_after?: string | null
+          oauth_client_id?: string | null
+          refresh_token_counter?: number | null
+          refresh_token_hmac_key?: string | null
           refreshed_at?: string | null
           tag?: string | null
           updated_at?: string | null
@@ -487,8 +661,11 @@ export type Database = {
           created_at?: string | null
           factor_id?: string | null
           id?: string
-          ip?: unknown | null
+          ip?: unknown
           not_after?: string | null
+          oauth_client_id?: string | null
+          refresh_token_counter?: number | null
+          refresh_token_hmac_key?: string | null
           refreshed_at?: string | null
           tag?: string | null
           updated_at?: string | null
@@ -496,6 +673,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sessions_oauth_client_id_fkey"
+            columns: ["oauth_client_id"]
+            isOneToOne: false
+            referencedRelation: "oauth_clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sessions_user_id_fkey"
             columns: ["user_id"]
@@ -540,18 +724,21 @@ export type Database = {
       sso_providers: {
         Row: {
           created_at: string | null
+          disabled: boolean | null
           id: string
           resource_id: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          disabled?: boolean | null
           id: string
           resource_id?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          disabled?: boolean | null
           id?: string
           resource_id?: string | null
           updated_at?: string | null
@@ -677,28 +864,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      email: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      jwt: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      uid: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      email: { Args: never; Returns: string }
+      jwt: { Args: never; Returns: Json }
+      role: { Args: never; Returns: string }
+      uid: { Args: never; Returns: string }
     }
     Enums: {
       aal_level: "aal1" | "aal2" | "aal3"
       code_challenge_method: "s256" | "plain"
       factor_status: "unverified" | "verified"
       factor_type: "totp" | "webauthn" | "phone"
+      oauth_authorization_status: "pending" | "approved" | "denied" | "expired"
+      oauth_client_type: "public" | "confidential"
+      oauth_registration_type: "dynamic" | "manual"
+      oauth_response_type: "code"
       one_time_token_type:
         | "confirmation_token"
         | "reauthentication_token"
@@ -721,10 +900,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
-          extensions?: Json
         }
         Returns: Json
       }
@@ -738,6 +917,85 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          chat_id: string
+          content: string | null
+          created_at: string | null
+          deleted_at: string | null
+          embedding: string | null
+          id: string
+          role: Database["public"]["Enums"]["chat_roles"]
+          updated_at: string | null
+        }
+        Insert: {
+          chat_id: string
+          content?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          embedding?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["chat_roles"]
+          updated_at?: string | null
+        }
+        Update: {
+          chat_id?: string
+          content?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          embedding?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["chat_roles"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chats: {
+        Row: {
+          created_at: string | null
+          deleted_at: string | null
+          id: string
+          summary: string | null
+          title: string
+          updated_at: string | null
+          user_profile_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          summary?: string | null
+          title: string
+          updated_at?: string | null
+          user_profile_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string | null
+          user_profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chats_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       note_actions: {
         Row: {
           actor_id: string | null
@@ -1006,6 +1264,48 @@ export type Database = {
           },
         ]
       }
+      user_profiles: {
+        Row: {
+          auth_user_id: string | null
+          avatar_url: string | null
+          created_at: string | null
+          deleted_at: string | null
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          middle_name: string | null
+          onboarded_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auth_user_id?: string | null
+          avatar_url?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          middle_name?: string | null
+          onboarded_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auth_user_id?: string | null
+          avatar_url?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          middle_name?: string | null
+          onboarded_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_uploads: {
         Row: {
           auth_user_id: string
@@ -1050,48 +1350,6 @@ export type Database = {
           },
         ]
       }
-      user_profiles: {
-        Row: {
-          auth_user_id: string | null
-          avatar_url: string | null
-          created_at: string | null
-          deleted_at: string | null
-          email: string
-          first_name: string | null
-          id: string
-          last_name: string | null
-          middle_name: string | null
-          onboarded_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          auth_user_id?: string | null
-          avatar_url?: string | null
-          created_at?: string | null
-          deleted_at?: string | null
-          email: string
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          middle_name?: string | null
-          onboarded_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          auth_user_id?: string | null
-          avatar_url?: string | null
-          created_at?: string | null
-          deleted_at?: string | null
-          email?: string
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          middle_name?: string | null
-          onboarded_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -1100,6 +1358,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      chat_roles: "user" | "assistant"
       collaborator_roles: "owner" | "editor" | "reader"
       task_statuses:
         | "not_started"
@@ -1124,6 +1383,7 @@ export type Database = {
           owner: string | null
           owner_id: string | null
           public: boolean | null
+          type: Database["storage"]["Enums"]["buckettype"]
           updated_at: string | null
         }
         Insert: {
@@ -1136,6 +1396,7 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string | null
         }
         Update: {
@@ -1148,9 +1409,132 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string | null
         }
         Relationships: []
+      }
+      buckets_analytics: {
+        Row: {
+          created_at: string
+          format: string
+          id: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          format?: string
+          id: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          format?: string
+          id?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      buckets_vectors: {
+        Row: {
+          created_at: string
+          id: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      iceberg_namespaces: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iceberg_namespaces_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets_analytics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iceberg_tables: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          location: string
+          name: string
+          namespace_id: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id?: string
+          location: string
+          name: string
+          namespace_id: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          location?: string
+          name?: string
+          namespace_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iceberg_tables_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets_analytics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iceberg_tables_namespace_id_fkey"
+            columns: ["namespace_id"]
+            isOneToOne: false
+            referencedRelation: "iceberg_namespaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       migrations: {
         Row: {
@@ -1179,6 +1563,7 @@ export type Database = {
           created_at: string | null
           id: string
           last_accessed_at: string | null
+          level: number | null
           metadata: Json | null
           name: string | null
           owner: string | null
@@ -1193,6 +1578,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_accessed_at?: string | null
+          level?: number | null
           metadata?: Json | null
           name?: string | null
           owner?: string | null
@@ -1207,6 +1593,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_accessed_at?: string | null
+          level?: number | null
           metadata?: Json | null
           name?: string | null
           owner?: string | null
@@ -1219,6 +1606,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "objects_bucketId_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prefixes: {
+        Row: {
+          bucket_id: string
+          created_at: string | null
+          level: number
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string | null
+          level?: number
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string | null
+          level?: number
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prefixes_bucketId_fkey"
             columns: ["bucket_id"]
             isOneToOne: false
             referencedRelation: "buckets"
@@ -1324,103 +1743,204 @@ export type Database = {
           },
         ]
       }
+      vector_indexes: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id: string
+          metadata_configuration: Json | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id?: string
+          metadata_configuration?: Json | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          data_type?: string
+          dimension?: number
+          distance_metric?: string
+          id?: string
+          metadata_configuration?: Json | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vector_indexes_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets_vectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      can_insert_object: {
-        Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
-        }
+      add_prefixes: {
+        Args: { _bucket_id: string; _name: string }
         Returns: undefined
       }
-      extension: {
-        Args: {
-          name: string
-        }
-        Returns: string
+      can_insert_object: {
+        Args: { bucketid: string; metadata: Json; name: string; owner: string }
+        Returns: undefined
       }
-      filename: {
-        Args: {
-          name: string
-        }
-        Returns: string
+      delete_leaf_prefixes: {
+        Args: { bucket_ids: string[]; names: string[] }
+        Returns: undefined
       }
-      foldername: {
-        Args: {
-          name: string
-        }
-        Returns: string[]
+      delete_prefix: {
+        Args: { _bucket_id: string; _name: string }
+        Returns: boolean
       }
+      extension: { Args: { name: string }; Returns: string }
+      filename: { Args: { name: string }; Returns: string }
+      foldername: { Args: { name: string }; Returns: string[] }
+      get_level: { Args: { name: string }; Returns: number }
+      get_prefix: { Args: { name: string }; Returns: string }
+      get_prefixes: { Args: { name: string }; Returns: string[] }
       get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
-          size: number
           bucket_id: string
+          size: number
         }[]
       }
       list_multipart_uploads_with_delimiter: {
         Args: {
           bucket_id: string
-          prefix_param: string
           delimiter_param: string
           max_keys?: number
           next_key_token?: string
           next_upload_token?: string
+          prefix_param: string
         }
         Returns: {
-          key: string
-          id: string
           created_at: string
+          id: string
+          key: string
         }[]
       }
       list_objects_with_delimiter: {
         Args: {
           bucket_id: string
-          prefix_param: string
           delimiter_param: string
           max_keys?: number
-          start_after?: string
           next_token?: string
+          prefix_param: string
+          start_after?: string
         }
         Returns: {
-          name: string
           id: string
           metadata: Json
+          name: string
           updated_at: string
         }[]
       }
-      operation: {
-        Args: Record<PropertyKey, never>
-        Returns: string
+      lock_top_prefixes: {
+        Args: { bucket_ids: string[]; names: string[] }
+        Returns: undefined
       }
+      operation: { Args: never; Returns: string }
       search: {
         Args: {
-          prefix: string
           bucketname: string
-          limits?: number
           levels?: number
+          limits?: number
           offsets?: number
+          prefix: string
           search?: string
           sortcolumn?: string
           sortorder?: string
         }
         Returns: {
-          name: string
-          id: string
-          updated_at: string
           created_at: string
+          id: string
           last_accessed_at: string
           metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_legacy_v1: {
+        Args: {
+          bucketname: string
+          levels?: number
+          limits?: number
+          offsets?: number
+          prefix: string
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_v1_optimised: {
+        Args: {
+          bucketname: string
+          levels?: number
+          limits?: number
+          offsets?: number
+          prefix: string
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_v2: {
+        Args: {
+          bucket_name: string
+          levels?: number
+          limits?: number
+          prefix: string
+          sort_column?: string
+          sort_column_after?: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
         }[]
       }
     }
     Enums: {
-      [_ in never]: never
+      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1428,27 +1948,33 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1456,20 +1982,24 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1477,20 +2007,24 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1498,30 +2032,79 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
-    | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  auth: {
+    Enums: {
+      aal_level: ["aal1", "aal2", "aal3"],
+      code_challenge_method: ["s256", "plain"],
+      factor_status: ["unverified", "verified"],
+      factor_type: ["totp", "webauthn", "phone"],
+      oauth_authorization_status: ["pending", "approved", "denied", "expired"],
+      oauth_client_type: ["public", "confidential"],
+      oauth_registration_type: ["dynamic", "manual"],
+      oauth_response_type: ["code"],
+      one_time_token_type: [
+        "confirmation_token",
+        "reauthentication_token",
+        "recovery_token",
+        "email_change_token_new",
+        "email_change_token_current",
+        "phone_change_token",
+      ],
+    },
+  },
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      chat_roles: ["user", "assistant"],
+      collaborator_roles: ["owner", "editor", "reader"],
+      task_statuses: [
+        "not_started",
+        "in_progress",
+        "complete",
+        "wont_complete",
+      ],
+    },
+  },
+  storage: {
+    Enums: {
+      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
+    },
+  },
+} as const
 

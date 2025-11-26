@@ -10,7 +10,8 @@ create type "public"."chat_roles" as enum ('user', 'assistant');
     "deleted_at" timestamp with time zone,
     "role" public.chat_roles not null,
     "content" text,
-    "embedding" public.vector
+    "embedding" public.vector,
+    "chat_id" uuid not null
       );
 
 
@@ -33,6 +34,10 @@ CREATE UNIQUE INDEX chats_pkey ON public.chats USING btree (id);
 alter table "public"."chat_messages" add constraint "chat_messages_pkey" PRIMARY KEY using index "chat_messages_pkey";
 
 alter table "public"."chats" add constraint "chats_pkey" PRIMARY KEY using index "chats_pkey";
+
+alter table "public"."chat_messages" add constraint "chat_messages_chat_id_fkey" FOREIGN KEY (chat_id) REFERENCES public.chats(id) not valid;
+
+alter table "public"."chat_messages" validate constraint "chat_messages_chat_id_fkey";
 
 alter table "public"."chats" add constraint "chats_user_profile_id_fkey" FOREIGN KEY (user_profile_id) REFERENCES public.user_profiles(id) not valid;
 
