@@ -15,9 +15,11 @@ import {
 } from "@tiptap/extension-table";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
+import { Mathematics } from "@tiptap/extension-mathematics";
 import { lowlight } from "@/lib/lowlight-config";
 import { cn } from "@/lib/utils";
 import "highlight.js/styles/github.css";
+import "katex/dist/katex.min.css";
 
 interface AssistantMessageProps {
   content: string;
@@ -47,12 +49,20 @@ function AssistantMessage({
 
   const formattedTime = format(parseTimestamp(created_at), "h:mm a");
 
+  const preprocessMathContent = (text: string): string => {
+    if (!text) return text;
+    return text
+      .replace(/\\\[([\s\S]*?)\\\]/g, (_, latex) => `$$${latex}$$`)
+      .replace(/\\\(([\s\S]*?)\\\)/g, (_, latex) => `$${latex}$`);
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
       }),
       Markdown,
+      Mathematics,
       CodeBlockLowlight.configure({ lowlight }),
       Table.configure({
         resizable: true,
@@ -76,7 +86,10 @@ function AssistantMessage({
     if (editor && content && content !== lastContentRef.current) {
       try {
         lastContentRef.current = content;
-        editor.commands.setContent(content, { contentType: "markdown" });
+        const processedContent = preprocessMathContent(content);
+        editor.commands.setContent(processedContent, {
+          contentType: "markdown",
+        });
       } catch (error) {
         console.error("Error setting markdown content:", error);
       }
