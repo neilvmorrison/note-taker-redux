@@ -1,7 +1,6 @@
 import { streamText, convertToModelMessages } from "ai";
 import type { UIMessage } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { createChatMessage } from "@/lib/chats/chat-messages";
 
 const CHAT_MODEL = process.env.CHAT_MODEL || "gpt-4o-mini";
 
@@ -37,45 +36,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const lastMessage = messages[messages.length - 1];
-    const assistantContextId =
-      lastMessage?.role === "assistant" ? lastMessage.id : undefined;
-
     const result = streamText({
       model: openai(CHAT_MODEL),
       messages: convertToModelMessages(messages),
-      onFinish: async ({ text }) => {
-        try {
-          const assistantMessageId =
-            assistantContextId || `assistant-${Date.now()}`;
-
-          console.log("Streaming finished, saving assistant message:", {
-            chat_id: chatId,
-            chat_context_id: assistantMessageId,
-            textLength: text.length,
-          });
-
-          const result = await createChatMessage({
-            chat_id: chatId,
-            role: "assistant",
-            content: text,
-            chat_context_id: assistantMessageId,
-          });
-
-          if (result.success) {
-            console.log(
-              "Assistant message saved successfully:",
-              result.data?.id,
-              "chat_context_id:",
-              result.data?.chat_context_id
-            );
-          } else {
-            console.error("Failed to save assistant message:", result.message);
-          }
-        } catch (error) {
-          console.error("Error saving assistant message:", error);
-        }
-      },
     });
 
     return result.toUIMessageStreamResponse();

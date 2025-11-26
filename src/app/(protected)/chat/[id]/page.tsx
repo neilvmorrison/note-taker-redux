@@ -56,7 +56,7 @@ export default function ChatDetailPage() {
                 chat_context_id: assistantMessage.id,
                 content,
               }
-            ).catch(() => null);
+            );
 
             if (!existingMessage) {
               await createChatMessage({

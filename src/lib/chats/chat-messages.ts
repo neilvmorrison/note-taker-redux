@@ -88,7 +88,7 @@ export async function updateChatMessageByContextId(
     .eq("chat_context_id", chat_context_id)
     .eq("chat_id", chat_id)
     .select("*")
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   return updated_message;
