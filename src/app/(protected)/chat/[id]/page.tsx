@@ -223,7 +223,7 @@ export default function ChatDetailPage() {
   }, [isInitializing, chatMessages]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col min-h-[calc(100vh-60px)]">
       <PageHeader
         title={userMessageText?.slice(0, 50) || "Chat"}
         description="Chat conversation"
