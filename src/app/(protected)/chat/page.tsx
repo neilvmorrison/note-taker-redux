@@ -3,10 +3,21 @@ import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { Textarea } from "@/components/ui/textarea";
+import PromptInput from "@/components/prompt-input";
+import { useForm } from "@/hooks/use-form";
 
 export default function Chats() {
   const { user } = useCurrentUser();
+
+  const messageForm = useForm({
+    initialValues: {
+      message: "",
+    },
+    onSubmit: async (data) => {
+      console.log(data);
+    },
+  });
+
   return (
     <div>
       <PageHeader
@@ -19,10 +30,15 @@ export default function Chats() {
           <Text variant="h2">
             Hello, <span className="text-blue-500">{user?.first_name}</span>
           </Text>
-          <Textarea
-            placeholder="Type your request here..."
-            className="w-[480px] resize-none"
-          />
+          <form onSubmit={messageForm.handleSubmit}>
+            <PromptInput
+              placeholder="Type your request here..."
+              classNames={{
+                textarea: "w-[480px] border-0 shadow-none",
+              }}
+              {...messageForm.getFieldProps("message")}
+            />
+          </form>
         </div>
       </div>
     </div>
