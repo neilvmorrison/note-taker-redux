@@ -1,20 +1,33 @@
 "use client";
+import { useRouter } from "next/navigation";
 import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import PromptInput from "@/components/prompt-input";
 import { useForm } from "@/hooks/use-form";
+import useCreate from "@/hooks/use-create";
+import { createChatWithMessage } from "@/lib/chats";
 
 export default function Chats() {
   const { user } = useCurrentUser();
+  const router = useRouter();
+  const { createRecord, isLoading } = useCreate(createChatWithMessage);
 
   const messageForm = useForm({
     initialValues: {
       message: "",
     },
     onSubmit: async (data) => {
-      console.log(data);
+      if (!data.message.trim()) {
+        return;
+      }
+
+      const result = await createRecord(data.message.trim());
+      if (result?.success && result.data?.chat_id) {
+        messageForm.reset();
+        router.push(`/chat/${result.data.chat_id}`);
+      }
     },
   });
 
@@ -36,6 +49,7 @@ export default function Chats() {
               classNames={{
                 textarea: "w-[480px] border-0 shadow-none",
               }}
+              isSubmitting={isLoading}
               {...messageForm.getFieldProps("message")}
             />
           </form>
