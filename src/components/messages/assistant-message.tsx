@@ -95,7 +95,7 @@ function AssistantMessage({
     <div className="flex justify-start mb-4">
       <div
         className={cn(
-          "max-w-[70%] rounded-2xl px-4 py-2",
+          "rounded-2xl px-4 py-2",
           "bg-muted text-foreground",
           "rounded-bl-sm",
           "assistant-message-content"
