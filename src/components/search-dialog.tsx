@@ -14,7 +14,10 @@ export default function SearchDialog() {
   return (
     <Dialog open={showDialog} onOpenChange={toggleDialog}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="bg-gray-100 hover:bg-gray-200">
+        <Button
+          variant="ghost"
+          className="dark:bg-muted dark:hover:bg-muted/80"
+        >
           Cmd + K to Search
         </Button>
       </DialogTrigger>

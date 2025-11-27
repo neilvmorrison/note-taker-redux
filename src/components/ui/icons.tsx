@@ -8,6 +8,7 @@ import * as Md from "react-icons/md";
 import * as Fa from "react-icons/fa";
 import * as Cg from "react-icons/cg";
 import * as Pi from "react-icons/pi";
+import * as Io from "react-icons/io5";
 
 import { IconBaseProps } from "react-icons/lib";
 
@@ -31,7 +32,8 @@ export type IconNames =
   | "chevron_left"
   | "chevron_right"
   | "feed"
-  | "logo";
+  | "logo"
+  | "ai";
 
 interface BaseIconProps {
   name: IconNames;
@@ -98,6 +100,8 @@ export default function Icon({
         return Cg.CgFeed;
       case "logo":
         return Pi.PiNotebook;
+      case "ai":
+        return Io.IoSparklesSharp;
 
       default:
         console.warn(`Icon ${name} not found`);
