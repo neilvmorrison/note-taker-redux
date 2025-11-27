@@ -48,7 +48,8 @@
     }
 
     /* Function & Method Names, JSX Component Names, Class Names (Major Identifiers) */
-    .hljs-title.hljs-function,
+
+    .hljs-title.hljs-function_,
     .hljs-title.hljs-class,
     .hljs-title.hljs-class .hljs-title.hljs-function {
       /* Tiptap/Highlight.js can be tricky here */

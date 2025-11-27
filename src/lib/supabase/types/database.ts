@@ -926,6 +926,7 @@ export type Database = {
           deleted_at: string | null
           embedding: string | null
           id: string
+          model: string | null
           role: Database["public"]["Enums"]["chat_roles"]
           updated_at: string | null
         }
@@ -937,6 +938,7 @@ export type Database = {
           deleted_at?: string | null
           embedding?: string | null
           id?: string
+          model?: string | null
           role: Database["public"]["Enums"]["chat_roles"]
           updated_at?: string | null
         }
@@ -948,6 +950,7 @@ export type Database = {
           deleted_at?: string | null
           embedding?: string | null
           id?: string
+          model?: string | null
           role?: Database["public"]["Enums"]["chat_roles"]
           updated_at?: string | null
         }

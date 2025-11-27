@@ -26,11 +26,19 @@ export default function ChatDetailPage() {
   const hasAutoTriggered = useRef(false);
   const savedMessageIds = useRef<Set<string>>(new Set());
   const persistedMessagesMap = useRef<
-    Map<string, { id: string; chat_context_id: string | null; content: string }>
+    Map<
+      string,
+      {
+        id: string;
+        chat_context_id: string | null;
+        content: string;
+        model: string | null;
+      }
+    >
   >(new Map());
 
   const [inputValue, setInputValue] = useState("");
-
+  const CHAT_MODEL = "gpt-4o-mini";
   const {
     messages: chatMessages,
     status,
@@ -72,6 +80,7 @@ export default function ChatDetailPage() {
                 role: "assistant",
                 content,
                 chat_context_id: assistantMessage.id,
+                model: CHAT_MODEL,
               });
             }
           }
@@ -102,12 +111,14 @@ export default function ChatDetailPage() {
             id: msg.id,
             chat_context_id: msg.chat_context_id,
             content: msg.content || "",
+            model: msg.model || "",
           });
           if (!msg.chat_context_id) {
             persistedMessagesMap.current.set(msg.id, {
               id: msg.id,
               chat_context_id: msg.chat_context_id,
               content: msg.content || "",
+              model: msg.model || "",
             });
           }
         });
@@ -232,11 +243,13 @@ export default function ChatDetailPage() {
                 id: persistedMessage.id,
                 chat_context_id: message.id,
                 content: persistedMessage.content,
+                model: persistedMessage.model,
               });
               persistedMessagesMap.current.set(persistedMessage.id, {
                 id: persistedMessage.id,
                 chat_context_id: message.id,
                 content: persistedMessage.content,
+                model: persistedMessage.model,
               });
             } else {
               const existingMessage = await updateChatMessageByContextId(
@@ -302,6 +315,7 @@ export default function ChatDetailPage() {
         ) : (
           <div className="max-w-4xl mx-auto">
             {chatMessages.map((message) => {
+              const model = persistedMessagesMap.current.get(message.id)?.model;
               const msgTextPart = message.parts?.find(
                 (
                   part
@@ -325,12 +339,14 @@ export default function ChatDetailPage() {
               } else {
                 const isStreaming =
                   msgTextPart?.state === "streaming" || isLoading;
+                console.log(message);
                 return (
                   <AssistantMessage
                     key={message.id}
                     content={content}
                     created_at={createdAt}
                     isStreaming={isStreaming}
+                    model={model ?? null}
                   />
                 );
               }
