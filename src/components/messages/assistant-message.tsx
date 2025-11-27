@@ -111,7 +111,8 @@ function AssistantMessage({
           "rounded-2xl px-4 py-2",
           "bg-muted text-foreground",
           "rounded-bl-sm",
-          "assistant-message-content"
+          "assistant-message-content",
+          "w-full"
         )}
       >
         <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
