@@ -56,8 +56,6 @@ export function BreadcrumbNav({
     );
   }
 
-  console.log(breadcrumbs);
-
   return (
     <Breadcrumb className={className}>
       <BreadcrumbList>

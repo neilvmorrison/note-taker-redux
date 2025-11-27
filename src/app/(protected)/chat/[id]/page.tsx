@@ -339,7 +339,6 @@ export default function ChatDetailPage() {
               } else {
                 const isStreaming =
                   msgTextPart?.state === "streaming" || isLoading;
-                console.log(message);
                 return (
                   <AssistantMessage
                     key={message.id}
