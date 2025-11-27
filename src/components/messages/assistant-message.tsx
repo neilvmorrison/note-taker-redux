@@ -16,21 +16,28 @@ import {
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import { Mathematics } from "@tiptap/extension-mathematics";
-import { lowlight } from "@/lib/lowlight-config";
+import { all, createLowlight } from "lowlight";
+
 import { cn } from "@/lib/utils";
 import "highlight.js/styles/github.css";
 import "katex/dist/katex.min.css";
+import highlightjs from "highlight.js";
+import "./editor.css";
 
 interface AssistantMessageProps {
   content: string;
   created_at: string;
   isStreaming?: boolean;
+  model: string | null;
 }
+
+const lowlight = createLowlight(all);
 
 function AssistantMessage({
   content,
   created_at,
   isStreaming,
+  model,
 }: AssistantMessageProps) {
   const lastContentRef = useRef<string>("");
 
@@ -77,6 +84,11 @@ function AssistantMessage({
         openOnClick: false,
       }),
     ],
+    onUpdate: ({ editor }) => {
+      if (editor.getText().length > 0) {
+        highlightjs.highlightAll();
+      }
+    },
     content: content || "",
     editable: false,
     immediatelyRender: false,
@@ -121,8 +133,14 @@ function AssistantMessage({
             <span className="inline-block w-2 h-4 ml-1 bg-foreground animate-pulse" />
           )}
         </div>
-        <div className="flex justify-end mt-1">
-          <span className="text-xs text-muted-foreground">{formattedTime}</span>
+        <div className="flex justify-end mt-1 gap-2 items-center text-xs text-muted-foreground">
+          {model && (
+            <>
+              <span>{model}</span>
+              <span>•</span>
+            </>
+          )}
+          <span>{formattedTime}</span>
         </div>
       </div>
     </div>

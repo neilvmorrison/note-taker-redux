@@ -1,0 +1,98 @@
+.tiptap {
+  :first-child {
+    margin-top: 0;
+  }
+
+  pre {
+    /* VS Code Dark+ Background Color: A very dark gray */
+    background: #1e1e1e;
+    border-radius: 0.5rem;
+    /* Default Text Color: A light, slightly grayed-out white */
+    color: #d4d4d4;
+    font-family: "JetBrainsMono", monospace;
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+    /* Ensure the scrollbar is hidden if necessary for a clean look */
+    overflow-x: auto;
+
+    code {
+      background: none;
+      color: inherit;
+      font-size: 0.8rem;
+      padding: 0;
+    }
+
+    /* --- VS Code Syntax Highlighting Colors --- */
+
+    /* Comments and Documentation (File Path Comment is in this group) */
+    .hljs-comment,
+    .hljs-quote {
+      color: #6a9955; /* Dark Green */
+    }
+
+    /* Keywords (const, return, import, export, new, function, class, if, else) */
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-built_in, /* built-in types like Math, console */
+    .hljs-tag {
+      /* HTML/JSX tag names (<div>, <h1>) */
+      color: #569cd6; /* Light Blue/Cyan */
+    }
+
+    /* Strings (Text inside quotes) */
+    .hljs-string,
+    .hljs-symbol,
+    .hljs-bullet,
+    .hljs-regexp {
+      color: #ce9178; /* Orange-Brown */
+    }
+
+    /* Function & Method Names, JSX Component Names, Class Names (Major Identifiers) */
+
+    .hljs-title.hljs-function_,
+    .hljs-title.hljs-class,
+    .hljs-title.hljs-class .hljs-title.hljs-function {
+      /* Tiptap/Highlight.js can be tricky here */
+      color: #dcdcaa; /* Light Yellow */
+    }
+
+    /* Numbers (0, 100, 3.14) and Booleans (true, false, null) */
+    .hljs-number,
+    .hljs-literal {
+      color: #b5cea8; /* Pale Green */
+    }
+
+    /* Variable Names, Properties, Attributes, Selectors (Often white, but sometimes colored) */
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-attribute,
+    .hljs-name, /* Property names like 'length' */
+    .hljs-selector-id,
+    .hljs-selector-class,
+    .hljs-attr {
+      /* HTML/JSX attributes (e.g., 'className') */
+      color: #9cdcfe; /* Lighter Blue/Cyan */
+    }
+
+    /* Operators and Punctuation (Often fall back to the default text color) */
+    .hljs-operator,
+    .hljs-punctuation {
+      color: #d4d4d4; /* Default White/Light Gray */
+    }
+
+    /* TypeScript Types and Parameters */
+    .hljs-type,
+    .hljs-params {
+      color: #4ec9b0; /* Teal/Aqua */
+    }
+
+    /* General emphasis */
+    .hljs-emphasis {
+      font-style: italic;
+    }
+
+    .hljs-strong {
+      font-weight: 700;
+    }
+  }
+}
