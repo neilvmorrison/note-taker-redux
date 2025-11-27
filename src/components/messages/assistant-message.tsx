@@ -16,16 +16,21 @@ import {
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import { Mathematics } from "@tiptap/extension-mathematics";
-import { lowlight } from "@/lib/lowlight-config";
+import { all, createLowlight } from "lowlight";
+
 import { cn } from "@/lib/utils";
 import "highlight.js/styles/github.css";
 import "katex/dist/katex.min.css";
+import highlightjs from "highlight.js";
+import "./editor.css";
 
 interface AssistantMessageProps {
   content: string;
   created_at: string;
   isStreaming?: boolean;
 }
+
+const lowlight = createLowlight(all);
 
 function AssistantMessage({
   content,
@@ -77,6 +82,11 @@ function AssistantMessage({
         openOnClick: false,
       }),
     ],
+    onUpdate: ({ editor }) => {
+      if (editor.getText().length > 0) {
+        highlightjs.highlightAll();
+      }
+    },
     content: content || "",
     editable: false,
     immediatelyRender: false,
