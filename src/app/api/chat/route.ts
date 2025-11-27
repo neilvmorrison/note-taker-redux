@@ -2,18 +2,20 @@ import { streamText, convertToModelMessages } from "ai";
 import type { UIMessage } from "ai";
 import { openai } from "@ai-sdk/openai";
 
-const CHAT_MODEL = process.env.CHAT_MODEL || "gpt-4o-mini";
+const DEFAULT_CHAT_MODEL = process.env.CHAT_MODEL || "gpt-4o-mini";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { messages, chat_id, id } = body as {
+    const { messages, chat_id, id, model } = body as {
       messages?: UIMessage[];
       chat_id?: string;
       id?: string;
+      model?: string;
     };
 
     const chatId = chat_id || id;
+    const selectedModel = model || DEFAULT_CHAT_MODEL;
 
     if (!chatId) {
       console.error("Missing chat_id/id in request body:", body);
@@ -37,7 +39,7 @@ export async function POST(req: Request) {
     }
 
     const result = streamText({
-      model: openai(CHAT_MODEL),
+      model: openai(selectedModel),
       messages: convertToModelMessages(messages),
     });
 

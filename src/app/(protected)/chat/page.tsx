@@ -9,7 +9,7 @@ import { useForm } from "@/hooks/use-form";
 import useCreate from "@/hooks/use-create";
 import { createChatWithMessage } from "@/lib/chats";
 
-export default function Chats() {
+export default function NewChat() {
   const { user } = useCurrentUser();
   const router = useRouter();
   const { createRecord, isLoading } = useCreate(createChatWithMessage);
@@ -17,6 +17,7 @@ export default function Chats() {
   const messageForm = useForm({
     initialValues: {
       message: "",
+      model: "gpt-4o-mini",
     },
     onSubmit: async (data) => {
       if (!data.message.trim()) {
@@ -26,11 +27,13 @@ export default function Chats() {
       const result = await createRecord(data.message.trim());
       if (result?.success && result.data?.chat_id) {
         messageForm.reset();
-        router.push(`/chat/${result.data.chat_id}`);
+        router.push(
+          `/chat/${result.data.chat_id}?model=${encodeURIComponent(data.model)}`
+        );
       }
     },
   });
-
+  console.log(messageForm);
   return (
     <div>
       <PageHeader
@@ -47,8 +50,10 @@ export default function Chats() {
             <PromptInput
               placeholder="Type your request here..."
               classNames={{
-                textarea: "w-[480px] border-0 shadow-none",
+                textarea: "xs:w-full md:w-[480px] border-0 shadow-none",
               }}
+              currentModel={messageForm.getFieldProps("model").value}
+              onModelChange={messageForm.handleChange("model")}
               isSubmitting={isLoading}
               {...messageForm.getFieldProps("message")}
             />

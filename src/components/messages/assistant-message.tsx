@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { parseISO } from "date-fns";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -36,10 +36,11 @@ const lowlight = createLowlight(all);
 function AssistantMessage({
   content,
   created_at,
-  isStreaming,
   model,
 }: AssistantMessageProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const lastContentRef = useRef<string>("");
+  const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const parseTimestamp = (timestamp: string): Date => {
     if (!timestamp) return new Date();
@@ -55,6 +56,20 @@ function AssistantMessage({
   };
 
   const formattedTime = format(parseTimestamp(created_at), "h:mm a");
+
+  const getFirstLine = (text: string): string => {
+    if (!text) return "";
+    const plainText = text.replace(/[#*`_~\[\]()]/g, "").trim();
+    const lines = plainText
+      .split("\n")
+      .filter((line) => line.trim().length > 0);
+    const firstLine = lines[0] || "";
+    return firstLine.length > 100 ? firstLine.slice(0, 100) + "..." : firstLine;
+  };
+
+  const firstLine = getFirstLine(content);
+  const hasMultipleLines =
+    content.split("\n").filter((line) => line.trim().length > 0).length > 1;
 
   const preprocessMathContent = (text: string): string => {
     if (!text) return text;
@@ -116,21 +131,64 @@ function AssistantMessage({
     };
   }, [editor]);
 
+  if (!hasMultipleLines && !content.trim()) {
+    return (
+      <div className="flex justify-start mb-4">
+        <div
+          className={cn(
+            "rounded-2xl px-6 py-6",
+            "bg-muted text-foreground",
+            "rounded-bl-sm",
+            "assistant-message-content",
+            "w-full"
+          )}
+        >
+          <div className="text-sm text-muted-foreground">
+            Assistant Response
+          </div>
+          <div className="flex justify-end mt-1 gap-2 items-center text-xs text-muted-foreground">
+            {model && (
+              <>
+                <span>{model}</span>
+                <span>•</span>
+              </>
+            )}
+            <span>{formattedTime}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-start mb-4">
       <div
         className={cn(
-          "rounded-2xl px-4 py-2",
+          "rounded-2xl px-6 py-6",
           "bg-muted text-foreground",
           "rounded-bl-sm",
           "assistant-message-content",
-          "w-full"
+          "w-full",
+          hasMultipleLines && "cursor-pointer"
         )}
+        onClick={() => hasMultipleLines && setIsCollapsed(!isCollapsed)}
       >
-        <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
-          <EditorContent editor={editor} />
-          {isStreaming && (
-            <span className="inline-block w-2 h-4 ml-1 bg-foreground animate-pulse" />
+        <div className="relative">
+          {isCollapsed && hasMultipleLines ? (
+            <div className="text-sm text-muted-foreground transition-opacity duration-300">
+              {firstLine || "Assistant Response"}
+            </div>
+          ) : (
+            <div
+              ref={contentContainerRef}
+              className={cn(
+                "text-sm prose prose-sm dark:prose-invert max-w-none",
+                "transition-all duration-300 ease-in-out",
+                "animate-in fade-in slide-in-from-top-1"
+              )}
+            >
+              <EditorContent editor={editor} />
+            </div>
           )}
         </div>
         <div className="flex justify-end mt-1 gap-2 items-center text-xs text-muted-foreground">

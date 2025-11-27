@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -17,10 +17,12 @@ import AssistantMessage from "@/components/messages/assistant-message";
 import PromptInput from "@/components/prompt-input";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import { models } from "@/constants/models";
 
 export default function ChatDetailPage() {
   const { id: chatId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const hasAutoTriggered = useRef(false);
@@ -33,12 +35,47 @@ export default function ChatDetailPage() {
         chat_context_id: string | null;
         content: string;
         model: string | null;
+        created_at: string | null;
       }
     >
   >(new Map());
 
+  const urlModel = searchParams.get("model");
+  const initialModel =
+    urlModel &&
+    Object.values(models).includes(
+      urlModel as (typeof models)[keyof typeof models]
+    )
+      ? urlModel
+      : "gpt-4o-mini";
+
   const [inputValue, setInputValue] = useState("");
-  const CHAT_MODEL = "gpt-4o-mini";
+  const [currentModel, setCurrentModel] = useState(initialModel);
+  const modelRef = useRef(initialModel);
+
+  useEffect(() => {
+    modelRef.current = currentModel;
+  }, [currentModel]);
+
+  useEffect(() => {
+    if (initialModel !== currentModel) {
+      setCurrentModel(initialModel);
+      modelRef.current = initialModel;
+    }
+  }, [initialModel, currentModel]);
+
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: () => ({
+          chat_id: chatId as string,
+          model: modelRef.current,
+        }),
+      }),
+    [chatId]
+  );
+
   const {
     messages: chatMessages,
     status,
@@ -47,12 +84,7 @@ export default function ChatDetailPage() {
     setMessages,
   } = useChat({
     id: chatId as string,
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: {
-        chat_id: chatId as string,
-      },
-    }),
+    transport,
     onFinish: async (message) => {
       if (!chatId || typeof chatId !== "string") return;
 
@@ -80,7 +112,7 @@ export default function ChatDetailPage() {
                 role: "assistant",
                 content,
                 chat_context_id: assistantMessage.id,
-                model: CHAT_MODEL,
+                model: currentModel,
               });
             }
           }
@@ -112,6 +144,7 @@ export default function ChatDetailPage() {
             chat_context_id: msg.chat_context_id,
             content: msg.content || "",
             model: msg.model || "",
+            created_at: msg.created_at || "",
           });
           if (!msg.chat_context_id) {
             persistedMessagesMap.current.set(msg.id, {
@@ -119,6 +152,7 @@ export default function ChatDetailPage() {
               chat_context_id: msg.chat_context_id,
               content: msg.content || "",
               model: msg.model || "",
+              created_at: msg.created_at || "",
             });
           }
         });
@@ -244,12 +278,14 @@ export default function ChatDetailPage() {
                 chat_context_id: message.id,
                 content: persistedMessage.content,
                 model: persistedMessage.model,
+                created_at: persistedMessage.created_at,
               });
               persistedMessagesMap.current.set(persistedMessage.id, {
                 id: persistedMessage.id,
                 chat_context_id: message.id,
                 content: persistedMessage.content,
                 model: persistedMessage.model,
+                created_at: persistedMessage.created_at,
               });
             } else {
               const existingMessage = await updateChatMessageByContextId(
@@ -316,6 +352,9 @@ export default function ChatDetailPage() {
           <div className="max-w-4xl mx-auto">
             {chatMessages.map((message) => {
               const model = persistedMessagesMap.current.get(message.id)?.model;
+              const createdAt =
+                persistedMessagesMap.current.get(message.id)?.created_at ??
+                new Date().toISOString();
               const msgTextPart = message.parts?.find(
                 (
                   part
@@ -326,7 +365,6 @@ export default function ChatDetailPage() {
                 } => part.type === "text"
               );
               const content = msgTextPart?.text || "";
-              const createdAt = new Date().toISOString();
 
               if (message.role === "user") {
                 return (
@@ -368,6 +406,8 @@ export default function ChatDetailPage() {
             onChange={setInputValue}
             placeholder="Type your message here..."
             isSubmitting={isLoading}
+            currentModel={currentModel}
+            onModelChange={setCurrentModel}
             classNames={{
               textarea: "border-0 shadow-none",
             }}

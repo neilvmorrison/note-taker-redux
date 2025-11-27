@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 // Extend the IconNames type with additional icons
 export type IconNames =
+  | "send"
   | "email_check"
   | "email_x"
   | "edit"
@@ -65,6 +66,8 @@ export default function Icon({
   const getIconComponent = (): IconType => {
     switch (name) {
       // Existing icons
+      case "send":
+        return Fi.FiSend;
       case "email_check":
         return LuMailCheck;
       case "email_x":

@@ -1,8 +1,23 @@
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
+import Icon from "./ui/icons";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { Spinner } from "./ui/spinner";
 import { Textarea } from "./ui/textarea";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { models } from "@/constants/models";
 
 interface PromptInputProps {
   value: string;
@@ -14,7 +29,9 @@ interface PromptInputProps {
     content?: string;
     textarea?: string;
   };
+  currentModel: string;
   onChange: (value: string) => void;
+  onModelChange: (value: string) => void;
 }
 
 export default function PromptInput({
@@ -23,26 +40,45 @@ export default function PromptInput({
   className,
   classNames = {},
   isSubmitting,
-  onChange,
+  onChange: onPromptChange,
+  onModelChange,
+  currentModel,
 }: PromptInputProps) {
   return (
     <Card className={cn(classNames.card)}>
-      <CardContent className={cn("flex flex-col gap-2", classNames.content)}>
+      <CardContent className={cn("flex flex-col gap-6", classNames.content)}>
         <Textarea
           placeholder={placeholder}
           className={cn("w-full resize-none", className, classNames.textarea)}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onPromptChange(e.target.value)}
         />
-        {value.length > 0 && (
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full align-self-end"
+        <div className="flex justify-between">
+          <Select
+            onValueChange={(value) => onModelChange(value)}
+            value={currentModel}
           >
-            {isSubmitting ? <Spinner /> : "Send"}
-          </Button>
-        )}
+            <SelectTrigger>
+              <SelectValue placeholder="Select a model" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(models).map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {value.length > 0 && (
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="size-fit self-end h-[40px] w-[40px] rounded-full"
+            >
+              {isSubmitting ? <Spinner /> : <Icon name="send" />}
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
