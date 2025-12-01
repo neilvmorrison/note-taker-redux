@@ -1,4 +1,4 @@
-import { createLowlight } from "lowlight";
+import { createLowlight, type LanguageFn } from "lowlight";
 import typescript from "highlight.js/lib/languages/typescript";
 import python from "highlight.js/lib/languages/python";
 import cpp from "highlight.js/lib/languages/cpp";
@@ -11,21 +11,20 @@ import sql from "highlight.js/lib/languages/sql";
 
 const lowlight = createLowlight();
 
-lowlight.register("typescript", typescript);
-lowlight.register("ts", typescript);
-lowlight.register("python", python);
-lowlight.register("py", python);
-lowlight.register("cpp", cpp);
-lowlight.register("c++", cpp);
-lowlight.register("cxx", cpp);
-lowlight.register("javascript", javascript);
-lowlight.register("js", javascript);
-lowlight.register("json", json);
-lowlight.register("css", css);
-lowlight.register("html", html);
-lowlight.register("bash", bash);
-lowlight.register("sh", bash);
-lowlight.register("sql", sql);
+lowlight.register("typescript", typescript as unknown as LanguageFn);
+lowlight.register("ts", typescript as unknown as LanguageFn);
+lowlight.register("python", python as unknown as LanguageFn);
+lowlight.register("py", python as unknown as LanguageFn);
+lowlight.register("cpp", cpp as unknown as LanguageFn);
+lowlight.register("c++", cpp as unknown as LanguageFn);
+lowlight.register("cxx", cpp as unknown as LanguageFn);
+lowlight.register("javascript", javascript as unknown as LanguageFn);
+lowlight.register("js", javascript as unknown as LanguageFn);
+lowlight.register("json", json as unknown as LanguageFn);
+lowlight.register("css", css as unknown as LanguageFn);
+lowlight.register("html", html as unknown as LanguageFn);
+lowlight.register("bash", bash as unknown as LanguageFn);
+lowlight.register("sh", bash as unknown as LanguageFn);
+lowlight.register("sql", sql as unknown as LanguageFn);
 
 export { lowlight };
-
