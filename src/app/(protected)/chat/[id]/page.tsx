@@ -404,7 +404,7 @@ export default function ChatDetailPage() {
           <PromptInput
             value={inputValue}
             onChange={setInputValue}
-            placeholder="Type your message here..."
+            placeholder="Continue the conversation..."
             isSubmitting={isLoading}
             currentModel={currentModel}
             onModelChange={setCurrentModel}

@@ -48,7 +48,7 @@ export default function NewChat() {
           </Text>
           <form onSubmit={messageForm.handleSubmit}>
             <PromptInput
-              placeholder="Type your request here..."
+              placeholder="Let's chat..."
               classNames={{
                 textarea: "xs:w-full md:w-[480px] border-0 shadow-none",
               }}
