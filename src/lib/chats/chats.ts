@@ -4,10 +4,8 @@ import { getCurrentUser } from "../auth";
 import { createClient } from "../supabase/server";
 import { Database } from "../supabase/types/database";
 
-export type InsertChatPayload =
-  Database["public"]["Tables"]["chats"]["Insert"];
-export type UpdateChatPayload =
-  Database["public"]["Tables"]["chats"]["Update"];
+export type InsertChatPayload = Database["public"]["Tables"]["chats"]["Insert"];
+export type UpdateChatPayload = Database["public"]["Tables"]["chats"]["Update"];
 export type Chat = Database["public"]["Tables"]["chats"]["Row"];
 
 export async function createChat(payload: InsertChatPayload) {
@@ -71,6 +69,12 @@ export async function getChatById(id: string) {
     .single();
 
   if (error) throw error;
+  if (found_chat) {
+    await sb
+      .from("chats")
+      .update({ last_viewed_at: new Date().toISOString() })
+      .eq("id", found_chat.id);
+  }
   return found_chat;
 }
 
@@ -89,7 +93,7 @@ export async function getChatsByUserId(user_id?: string) {
     .select("*")
     .eq("user_profile_id", target_user_id)
     .is("deleted_at", null)
-    .order("updated_at", { ascending: false });
+    .order("last_viewed_at", { ascending: false });
 
   if (error) throw error;
   return chats;
@@ -161,8 +165,9 @@ export async function createChatWithMessage(prompt: string) {
     return {
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to create chat with message",
+        error instanceof Error
+          ? error.message
+          : "Failed to create chat with message",
     };
   }
 }
-

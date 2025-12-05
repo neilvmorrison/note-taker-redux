@@ -969,6 +969,7 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           id: string
+          last_viewed_at: string | null
           summary: string | null
           title: string
           updated_at: string | null
@@ -978,6 +979,7 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           id?: string
+          last_viewed_at?: string | null
           summary?: string | null
           title: string
           updated_at?: string | null
@@ -987,6 +989,7 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           id?: string
+          last_viewed_at?: string | null
           summary?: string | null
           title?: string
           updated_at?: string | null
@@ -1055,6 +1058,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           is_pinned: boolean | null
+          last_viewed_at: string | null
           title: string | null
           updated_at: string | null
         }
@@ -1065,6 +1069,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           is_pinned?: boolean | null
+          last_viewed_at?: string | null
           title?: string | null
           updated_at?: string | null
         }
@@ -1075,6 +1080,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           is_pinned?: boolean | null
+          last_viewed_at?: string | null
           title?: string | null
           updated_at?: string | null
         }
@@ -1176,6 +1182,7 @@ export type Database = {
           deleted_at: string | null
           description: Json | null
           id: string
+          last_viewed_at: string | null
           name: string
           owner_id: string | null
           slug: string
@@ -1187,6 +1194,7 @@ export type Database = {
           deleted_at?: string | null
           description?: Json | null
           id?: string
+          last_viewed_at?: string | null
           name: string
           owner_id?: string | null
           slug: string
@@ -1198,6 +1206,7 @@ export type Database = {
           deleted_at?: string | null
           description?: Json | null
           id?: string
+          last_viewed_at?: string | null
           name?: string
           owner_id?: string | null
           slug?: string
