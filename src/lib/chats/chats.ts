@@ -78,7 +78,17 @@ export async function getChatById(id: string) {
   return found_chat;
 }
 
-export async function getChatsByUserId(user_id?: string) {
+export async function getChatsByUserId({
+  user_id,
+  limit = 50,
+  offset = 0,
+  title,
+}: {
+  user_id?: string;
+  limit?: number;
+  offset?: number;
+  title?: string;
+}) {
   const sb = await createClient();
   const current_user = await getCurrentUser();
 
@@ -88,13 +98,19 @@ export async function getChatsByUserId(user_id?: string) {
 
   const target_user_id = user_id || current_user.id;
 
-  const { data: chats, error } = await sb
+  let query = sb
     .from("chats")
     .select("*")
     .eq("user_profile_id", target_user_id)
     .is("deleted_at", null)
-    .order("last_viewed_at", { ascending: false });
+    .order("last_viewed_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
+  if (title) {
+    query = query.ilike("title", `%${title}%`);
+  }
+
+  const { data: chats, error } = await query;
   if (error) throw error;
   return chats;
 }
