@@ -1,6 +1,6 @@
 "use client";
 import { Text } from "@/components/ui/text";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProjectBySlug } from "@/lib/projects";
 import useProjectNotes from "@/hooks/use-project-notes";
@@ -15,7 +15,6 @@ import CreateProjectNoteButton from "@/components/create-project-note-button";
 
 export default function ProjectDetail() {
   const { slug } = useParams();
-  const _ = useRouter(); // Keep router instance for navigation
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [project, setProject] = useState<{

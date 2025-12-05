@@ -11,13 +11,25 @@ import CreateNoteButton from "@/components/create-note-button";
 import RowOrGrid from "@/components/row-or-grid";
 import ViewToggle from "@/components/view-toggle";
 import { Note } from "@/lib/notes";
+import useDebounce from "@/hooks/use-debounce";
 
 export default function NoteList() {
+  const { debounce } = useDebounce({ delay: 500 });
   const { push } = useRouter();
-  const { data: notes, isLoading } = useNotes();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { data: notes, isLoading } = useNotes({
+    searchTerm: debouncedSearchTerm,
+  });
   const [viewMode, setViewMode] = useState<"grid" | "row">("grid");
 
-  // Function to render notes in grid view (card style)
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    debounce(() => {
+      setDebouncedSearchTerm(value);
+    });
+  };
+
   const renderGridNote = (note: Note) => (
     <Card
       key={note.id}
@@ -35,7 +47,6 @@ export default function NoteList() {
     </Card>
   );
 
-  // Function to render notes in row view (list style)
   const renderRowNote = (note: Note) => (
     <div
       key={note.id}
@@ -64,7 +75,11 @@ export default function NoteList() {
         </div>
         <ViewToggle onChange={setViewMode} defaultView="grid" />
       </div>
-      <Input placeholder="Search Notes..." />
+      <Input
+        placeholder="Search Notes..."
+        value={searchTerm}
+        onChange={(e) => handleSearchChange(e.target.value)}
+      />
 
       <RowOrGrid
         orientation={viewMode}

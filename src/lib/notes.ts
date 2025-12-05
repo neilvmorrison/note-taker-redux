@@ -115,6 +115,10 @@ export async function getNoteById(id: string) {
       .eq("note_id", found_note.id)
       .maybeSingle();
     if (project_error) throw project_error;
+    await sb
+      .from("notes")
+      .update({ last_viewed_at: new Date().toISOString() })
+      .eq("id", found_note.id);
     return {
       ...found_note,
       project_id: project_data?.project_id ?? null,
@@ -126,7 +130,13 @@ export async function getAllNotes({
   limit = 50,
   offset = 0,
   authorId,
-}: { limit?: number; offset?: number; authorId?: string } = {}) {
+  title,
+}: {
+  limit?: number;
+  offset?: number;
+  authorId?: string;
+  title?: string;
+} = {}) {
   const sb = await createClient();
   const currentUser = await getCurrentUser();
   if (!currentUser) throw new Error("User Not Found");
@@ -134,8 +144,12 @@ export async function getAllNotes({
     .from("notes")
     .select("*")
     .eq("author_id", currentUser?.id)
-    .order("created_at", { ascending: false })
+    .order("last_viewed_at", { ascending: false })
     .range(offset, offset + limit - 1);
+
+  if (title) {
+    query = query.ilike("title", `%${title}%`);
+  }
 
   if (authorId) {
     query = query.eq("author_id", authorId);
@@ -152,12 +166,14 @@ export async function getAllNotes({
 
 export async function getAllProjectNotes(project_slug: string) {
   const sb = await createClient();
-
+  const currentUser = await getCurrentUser();
+  if (!currentUser) throw new Error("User Not Found");
   // First get the project ID from the slug
   const { data: project, error: projectError } = await sb
     .from("projects")
     .select("id")
     .eq("slug", project_slug)
+    .eq("owner_id", currentUser?.id)
     .is("deleted_at", null)
     .single();
 
@@ -179,7 +195,8 @@ export async function getAllProjectNotes(project_slug: string) {
         content,
         created_at,
         updated_at,
-        author_id
+        author_id,
+        last_viewed_at
       )
     `
     )

@@ -54,38 +54,59 @@ export async function getProjectById(id: string) {
     .from("projects")
     .select("*")
     .eq("id", id)
+    .order("last_viewed_at", { ascending: false })
     .single();
 
   if (error) throw error;
+  if (found_project) {
+    await sb
+      .from("projects")
+      .update({ last_viewed_at: new Date().toISOString() })
+      .eq("id", found_project.id);
+  }
   return found_project;
 }
 
 export async function getProjectBySlug(slug: string) {
   const sb = await createClient();
-
+  const currentUser = await getCurrentUser();
+  if (!currentUser) throw new Error("User Not Found");
   const { data: found_project, error } = await sb
     .from("projects")
     .select("*")
     .eq("slug", slug)
+    .eq("owner_id", currentUser?.id)
+    .order("last_viewed_at", { ascending: false })
     .is("deleted_at", null)
     .single();
 
   if (error) throw error;
+  if (found_project) {
+    await sb
+      .from("projects")
+      .update({ last_viewed_at: new Date().toISOString() })
+      .eq("id", found_project.id);
+  }
   return found_project;
 }
 
 export async function getAllProjects({
   limit = 50,
   offset = 0,
-}: { limit?: number; offset?: number; ownerId?: string } = {}) {
+  name,
+}: { limit?: number; offset?: number; ownerId?: string; name?: string } = {}) {
   const sb = await createClient();
   const currentUser = await getCurrentUser();
   if (!currentUser) throw new Error("User Not Found");
   let query = sb
     .from("projects")
     .select("*")
-    .order("created_at", { ascending: false })
+    .order("last_viewed_at", { ascending: false })
     .range(offset, offset + limit - 1);
+
+  if (name) {
+    query = query.ilike("name", `%${name}%`);
+  }
 
   query = query.eq("owner_id", currentUser.id);
 

@@ -4,10 +4,8 @@ import { getCurrentUser } from "../auth";
 import { createClient } from "../supabase/server";
 import { Database } from "../supabase/types/database";
 
-export type InsertChatPayload =
-  Database["public"]["Tables"]["chats"]["Insert"];
-export type UpdateChatPayload =
-  Database["public"]["Tables"]["chats"]["Update"];
+export type InsertChatPayload = Database["public"]["Tables"]["chats"]["Insert"];
+export type UpdateChatPayload = Database["public"]["Tables"]["chats"]["Update"];
 export type Chat = Database["public"]["Tables"]["chats"]["Row"];
 
 export async function createChat(payload: InsertChatPayload) {
@@ -71,10 +69,26 @@ export async function getChatById(id: string) {
     .single();
 
   if (error) throw error;
+  if (found_chat) {
+    await sb
+      .from("chats")
+      .update({ last_viewed_at: new Date().toISOString() })
+      .eq("id", found_chat.id);
+  }
   return found_chat;
 }
 
-export async function getChatsByUserId(user_id?: string) {
+export async function getChatsByUserId({
+  user_id,
+  limit = 50,
+  offset = 0,
+  title,
+}: {
+  user_id?: string;
+  limit?: number;
+  offset?: number;
+  title?: string;
+}) {
   const sb = await createClient();
   const current_user = await getCurrentUser();
 
@@ -84,13 +98,19 @@ export async function getChatsByUserId(user_id?: string) {
 
   const target_user_id = user_id || current_user.id;
 
-  const { data: chats, error } = await sb
+  let query = sb
     .from("chats")
     .select("*")
     .eq("user_profile_id", target_user_id)
     .is("deleted_at", null)
-    .order("updated_at", { ascending: false });
+    .order("last_viewed_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
+  if (title) {
+    query = query.ilike("title", `%${title}%`);
+  }
+
+  const { data: chats, error } = await query;
   if (error) throw error;
   return chats;
 }
@@ -161,8 +181,9 @@ export async function createChatWithMessage(prompt: string) {
     return {
       success: false,
       message:
-        error instanceof Error ? error.message : "Failed to create chat with message",
+        error instanceof Error
+          ? error.message
+          : "Failed to create chat with message",
     };
   }
 }
-

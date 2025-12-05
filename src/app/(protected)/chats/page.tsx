@@ -11,11 +11,24 @@ import ViewToggle from "@/components/view-toggle";
 import RowOrGrid from "@/components/row-or-grid";
 import { Chat } from "@/lib/chats";
 import { Button } from "@/components/ui/button";
+import useDebounce from "@/hooks/use-debounce";
 
 export default function Chats() {
   const { push } = useRouter();
-  const { data: chats, isLoading } = useChats();
+  const { debounce } = useDebounce({ delay: 500 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { data: chats, isLoading } = useChats({
+    searchTerm: debouncedSearchTerm,
+  });
   const [viewMode, setViewMode] = useState<"grid" | "row">("grid");
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    debounce(() => {
+      setDebouncedSearchTerm(value);
+    });
+  };
 
   const renderGridChat = (chat: Chat) => (
     <Card
@@ -74,7 +87,11 @@ export default function Chats() {
         </div>
         <ViewToggle onChange={setViewMode} defaultView="grid" />
       </div>
-      <Input placeholder="Search Chats..." />
+      <Input
+        placeholder="Search Chats..."
+        value={searchTerm}
+        onChange={(e) => handleSearchChange(e.target.value)}
+      />
 
       <RowOrGrid
         orientation={viewMode}
