@@ -11,13 +11,25 @@ import { format } from "date-fns";
 import ViewToggle from "@/components/view-toggle";
 import RowOrGrid from "@/components/row-or-grid";
 import { Project } from "@/lib/projects";
+import useDebounce from "@/hooks/use-debounce";
 
 export default function ProjectList() {
   const { push } = useRouter();
-  const { data: projects, isLoading } = useProjects();
+  const { debounce } = useDebounce({ delay: 500 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { data: projects, isLoading } = useProjects({
+    searchTerm: debouncedSearchTerm,
+  });
   const [viewMode, setViewMode] = useState<"grid" | "row">("grid");
 
-  // Function to render projects in grid view (card style)
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    debounce(() => {
+      setDebouncedSearchTerm(value);
+    });
+  };
+
   const renderGridProject = (project: Project) => (
     <Card
       key={project.id}
@@ -69,7 +81,11 @@ export default function ProjectList() {
         </div>
         <ViewToggle onChange={setViewMode} defaultView="grid" />
       </div>
-      <Input placeholder="Search Projects..." />
+      <Input
+        placeholder="Search Projects..."
+        value={searchTerm}
+        onChange={(e) => handleSearchChange(e.target.value)}
+      />
 
       <RowOrGrid
         orientation={viewMode}

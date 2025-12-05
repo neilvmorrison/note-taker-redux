@@ -1,7 +1,17 @@
 import { getAllProjects, Project } from "@/lib/projects";
 import { useEffect, useState } from "react";
 
-export default function useProjects() {
+interface IUseProjectsParams {
+  searchTerm?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export default function useProjects({
+  searchTerm,
+  limit = 50,
+  offset = 0,
+}: IUseProjectsParams = {}) {
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState<Project[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -10,7 +20,11 @@ export default function useProjects() {
     async function fetchProjects() {
       try {
         setLoading(true);
-        const projects = await getAllProjects();
+        const projects = await getAllProjects({
+          limit,
+          offset,
+          name: searchTerm,
+        });
         setData(projects);
       } catch (error) {
         setError(error as Error);
@@ -19,7 +33,7 @@ export default function useProjects() {
       }
     }
     fetchProjects();
-  }, []);
+  }, [searchTerm, limit, offset]);
 
   return {
     data,
