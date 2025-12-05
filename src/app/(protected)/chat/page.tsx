@@ -33,7 +33,7 @@ export default function NewChat() {
       }
     },
   });
-  console.log(messageForm);
+
   return (
     <div>
       <PageHeader
