@@ -130,7 +130,13 @@ export async function getAllNotes({
   limit = 50,
   offset = 0,
   authorId,
-}: { limit?: number; offset?: number; authorId?: string } = {}) {
+  title,
+}: {
+  limit?: number;
+  offset?: number;
+  authorId?: string;
+  title?: string;
+} = {}) {
   const sb = await createClient();
   const currentUser = await getCurrentUser();
   if (!currentUser) throw new Error("User Not Found");
@@ -140,6 +146,10 @@ export async function getAllNotes({
     .eq("author_id", currentUser?.id)
     .order("last_viewed_at", { ascending: false })
     .range(offset, offset + limit - 1);
+
+  if (title) {
+    query = query.ilike("title", `%${title}%`);
+  }
 
   if (authorId) {
     query = query.eq("author_id", authorId);
@@ -185,7 +195,8 @@ export async function getAllProjectNotes(project_slug: string) {
         content,
         created_at,
         updated_at,
-        author_id
+        author_id,
+        last_viewed_at
       )
     `
     )

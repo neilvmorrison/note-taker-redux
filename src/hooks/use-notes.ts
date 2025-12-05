@@ -1,7 +1,17 @@
 import { getAllNotes as _getAllNotes, Note } from "@/lib/notes";
 import { useEffect, useState } from "react";
 
-export default function useNotes() {
+interface IUseNotesParams {
+  searchTerm?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export default function useNotes({
+  searchTerm,
+  limit = 50,
+  offset = 0,
+}: IUseNotesParams = {}) {
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState<Note[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -10,7 +20,7 @@ export default function useNotes() {
     async function getAllNotes() {
       try {
         setLoading(true);
-        const notes = await _getAllNotes();
+        const notes = await _getAllNotes({ limit, offset, title: searchTerm });
         setData(notes);
       } catch (error) {
         setError(error as Error);
@@ -19,7 +29,7 @@ export default function useNotes() {
       }
     }
     getAllNotes();
-  }, []);
+  }, [searchTerm, limit, offset]);
 
   return {
     data,
