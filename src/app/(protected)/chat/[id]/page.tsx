@@ -5,7 +5,7 @@ import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Alert } from "@/components/ui/alert";
-import { getChatMessagesByChatId } from "@/lib/chats";
+import { getChatMessagesByChatId, updateChat } from "@/lib/chats";
 import { convertChatMessagesToUIMessages } from "@/lib/chats/utils";
 import {
   updateChatMessageByContextId,
@@ -52,6 +52,17 @@ export default function ChatDetailPage() {
   const [inputValue, setInputValue] = useState("");
   const [currentModel, setCurrentModel] = useState(initialModel);
   const modelRef = useRef(initialModel);
+
+  useEffect(() => {
+    async function updateChatLastViewedAt() {
+      if (!chatId || typeof chatId !== "string") return;
+      await updateChat({
+        id: chatId,
+        last_viewed_at: new Date().toISOString(),
+      });
+    }
+    updateChatLastViewedAt();
+  }, [chatId]);
 
   useEffect(() => {
     modelRef.current = currentModel;
