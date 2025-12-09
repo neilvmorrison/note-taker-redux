@@ -6,7 +6,7 @@ import Icon from "@/components/ui/icons";
 import { ResourceCard } from "@/components/resource-card";
 
 export default function Page() {
-  const { data, isLoading, isError, error } = useRecentActivity();
+  const { data } = useRecentActivity();
 
   return (
     <div className="mt-8 md:mt-12 flex flex-col items-center justify-center px-4 md:px-0 gap-16">
