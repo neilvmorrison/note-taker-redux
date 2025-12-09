@@ -1,5 +1,4 @@
 import { IconType } from "react-icons";
-import { LuMailCheck, LuMailX } from "react-icons/lu";
 import { BiError } from "react-icons/bi";
 import * as Bi from "react-icons/bi";
 import * as Fi from "react-icons/fi";
@@ -9,6 +8,7 @@ import * as Fa from "react-icons/fa";
 import * as Cg from "react-icons/cg";
 import * as Pi from "react-icons/pi";
 import * as Io from "react-icons/io5";
+import * as Lu from "react-icons/lu";
 
 import { IconBaseProps } from "react-icons/lib";
 
@@ -34,7 +34,11 @@ export type IconNames =
   | "chevron_right"
   | "feed"
   | "logo"
-  | "ai";
+  | "ai"
+  | "recent_activity"
+  | "note"
+  | "project"
+  | "chat";
 
 interface BaseIconProps {
   name: IconNames;
@@ -69,9 +73,9 @@ export default function Icon({
       case "send":
         return Fi.FiSend;
       case "email_check":
-        return LuMailCheck;
+        return Lu.LuMailCheck;
       case "email_x":
-        return LuMailX;
+        return Lu.LuMailX;
 
       case "edit":
         return Bi.BiEdit;
@@ -105,10 +109,17 @@ export default function Icon({
         return Pi.PiNotebook;
       case "ai":
         return Io.IoSparklesSharp;
+      case "recent_activity":
+        return Lu.LuClock3;
+      case "note":
+        return Pi.PiNotebook;
+      case "project":
+        return Pi.PiFolder;
+      case "chat":
+        return Pi.PiChat;
 
       default:
-        console.warn(`Icon ${name} not found`);
-        return LuMailX;
+        return Lu.LuMailX;
     }
   };
 

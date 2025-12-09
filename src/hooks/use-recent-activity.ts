@@ -1,93 +1,94 @@
-"use client";
+import { getRecentActivity } from "@/lib/recent-activity";
+import { useEffect, useMemo } from "react";
+import { useState } from "react";
+import { Note } from "@/lib/notes";
+import { Project } from "@/lib/projects";
+import { Chat } from "@/lib/chats";
 
-import useNotes from "./use-notes";
-import useProjects from "./use-projects";
-import { useMemo } from "react";
+export enum ActivityType {
+  NOTE = "note",
+  PROJECT = "project",
+  CHAT = "chat",
+}
 
-export type ActivityItem = {
+export interface IActivityItem {
   id: string;
   title: string;
-  type: "note" | "project";
+  type: ActivityType;
+  summary?: string;
+  lastViewedAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
   url: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-};
+}
 
-export default function useRecentActivity(limit: number = 4) {
-  // Leverage existing hooks that already fetch user-specific data
-  const {
-    data: notes,
-    isLoading: notesLoading,
-    isError: notesError,
-    error: notesErrorObj,
-  } = useNotes();
-  const {
-    data: projects,
-    isLoading: projectsLoading,
-    isError: projectsError,
-    error: projectsErrorObj,
-  } = useProjects();
+export function useRecentActivity() {
+  const [data, setData] = useState<{
+    notes: Note[];
+    projects: Project[];
+    chats: Chat[];
+  } | null>(null);
 
-  // Combined loading and error states
-  const isLoading = notesLoading || projectsLoading;
-  const isError = notesError || projectsError;
-  const error = notesErrorObj || projectsErrorObj;
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Memoize the activity computation to avoid unnecessary recalculations
-  const { recentActivity, recentNotes, recentProjects } = useMemo(() => {
-    // Default values if data isn't loaded yet
-    if (!notes || !projects) {
-      return {
-        recentActivity: null,
-        recentNotes: null,
-        recentProjects: null,
-      };
+  useEffect(() => {
+    async function fetchRecentActivity() {
+      try {
+        setIsLoading(true);
+        const recentActivity = await getRecentActivity();
+        setData(recentActivity);
+      } catch (error) {
+        setError(error as Error);
+      } finally {
+        setIsLoading(false);
+      }
     }
+    fetchRecentActivity();
+  }, []);
 
-    // Create combined activity feed
-    const combinedActivity: ActivityItem[] = [
-      ...notes.map(
-        (note): ActivityItem => ({
-          id: note.id,
-          title: note.title ?? "",
-          type: "note",
-          url: `/notes/${note.id}`,
-          createdAt: note.created_at,
-          updatedAt: note.updated_at,
-        })
-      ),
-      ...projects.map(
-        (project): ActivityItem => ({
-          id: project.id,
-          title: project.name,
-          type: "project",
-          url: `/projects/${project.slug}`,
-          createdAt: project.created_at,
-          updatedAt: project.updated_at,
-        })
-      ),
-    ];
+  const combinedActivity = useMemo(() => {
+    if (!data) return { combinedActivity: [], notes: [], chats: [] };
+    const combinedActivity: IActivityItem[] = [];
 
-    // Sort by updated_at or created_at, newest first
-    combinedActivity.sort((a, b) => {
-      const dateA = a.updatedAt || a.createdAt || "";
-      const dateB = b.updatedAt || b.createdAt || "";
-      return new Date(dateB).getTime() - new Date(dateA).getTime();
-    });
+    const noteActivity = data?.notes.map((note) => ({
+      id: note.id,
+      title: note.title ?? "",
+      type: ActivityType.NOTE,
+      createdAt: note.created_at ?? "",
+      updatedAt: note.updated_at ?? "",
+      url: `/notes/${note.id}`,
+      lastViewedAt: note.last_viewed_at ?? "",
+    }));
+
+    const chatActivity = data?.chats.map((chat) => ({
+      id: chat.id,
+      title: chat.title ?? "",
+      summary: chat.summary ?? "",
+      type: ActivityType.CHAT,
+      url: `/chat/${chat.id}`,
+      createdAt: chat.created_at ?? "",
+      updatedAt: chat.updated_at ?? "",
+      lastViewedAt: chat.last_viewed_at ?? "",
+    }));
+
+    combinedActivity.push(...noteActivity, ...chatActivity);
 
     return {
-      recentActivity: combinedActivity.slice(0, limit),
-      recentNotes: notes.slice(0, limit),
-      recentProjects: projects.slice(0, limit),
+      combinedActivity: combinedActivity.sort((a, b) => {
+        const dateA = a.lastViewedAt || a.createdAt || "";
+        const dateB = b.lastViewedAt || b.createdAt || "";
+        return new Date(dateB).getTime() - new Date(dateA).getTime();
+      }),
+      notes: noteActivity,
+      chats: chatActivity,
     };
-  }, [notes, projects, limit]);
+  }, [data]);
 
   return {
-    recentNotes,
-    recentProjects,
-    recentActivity,
+    data: { ...data, combinedActivity },
     isLoading,
-    isError,
+    isError: !!error,
     error,
   };
 }

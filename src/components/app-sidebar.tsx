@@ -15,18 +15,18 @@ import Link from "next/link";
 import { Text } from "./ui/text";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { UserProfile } from "@/lib/auth";
-import useRecentActivity from "@/hooks/use-recent-activity";
 import { RecentActivityList } from "./recent-activity-list";
 import Logo from "./logo";
 import { Button } from "./ui/button";
 import Icon from "./ui/icons";
+import { useRecentActivity } from "@/hooks/use-recent-activity";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user_profile?: UserProfile;
 }
 
 export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
-  const { recentActivity, isLoading } = useRecentActivity();
+  const { data, isLoading } = useRecentActivity();
 
   return (
     <Sidebar {...props}>
@@ -44,24 +44,10 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
           <SidebarGroupLabel>Recent Activity</SidebarGroupLabel>
           <SidebarGroupContent>
             <RecentActivityList
-              items={recentActivity}
+              items={data?.combinedActivity.combinedActivity ?? []}
               isLoading={isLoading}
               title="Activity"
               maxItems={6}
-            />
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel asChild>
-            <Link href="/projects">Projects</Link>
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <RecentActivityList
-              items={recentActivity}
-              isLoading={isLoading}
-              title="Projects"
-              maxItems={6}
-              type="project"
             />
           </SidebarGroupContent>
         </SidebarGroup>
@@ -71,7 +57,7 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <RecentActivityList
-              items={recentActivity}
+              items={data?.combinedActivity.notes ?? []}
               isLoading={isLoading}
               title="Notes"
               maxItems={6}
@@ -80,6 +66,20 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
+          <SidebarGroupLabel asChild>
+            <Link href="/projects">Projects</Link>
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            {/* <RecentActivityList
+              items={data?.combinedActivity ?? []}
+              isLoading={isLoading}
+              title="Projects"
+              maxItems={6}
+              type="project"
+            /> */}
+          </SidebarGroupContent>
+        </SidebarGroup>
+        {/* <SidebarGroup>
           <SidebarGroupLabel asChild>
             <Link href="/tasks">Tasks</Link>
           </SidebarGroupLabel>
@@ -92,18 +92,18 @@ export function AppSidebar({ user_profile, ...props }: AppSidebarProps) {
               type="note"
             />
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
         <SidebarGroup>
           <SidebarGroupLabel asChild>
             <Link href="/chats">Chats</Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <RecentActivityList
-              items={null}
+              items={data?.combinedActivity.chats ?? []}
               isLoading={isLoading}
-              title="Notes"
+              title="Chats"
               maxItems={6}
-              type="note"
+              type="chat"
             />
           </SidebarGroupContent>
         </SidebarGroup>
