@@ -22,7 +22,7 @@ export default function Page() {
           onChange={() => {}}
         />
       </div>
-      <div className="self-start ml-18 flex flex-col gap-4">
+      <div className="self-start lg:ml-18 flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Icon name="recent_activity" />
           <Text variant="h3">Recent Activity</Text>
@@ -38,7 +38,7 @@ export default function Page() {
                 (activity.lastViewedAt || activity.createdAt) ?? undefined
               }
               href={activity.url ?? ""}
-              className="min-w-[300px]"
+              className="w-[320px] md:min-w-[240px] lg:min-w-[300px]"
             />
           ))}
         </div>
