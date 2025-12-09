@@ -3,6 +3,7 @@ import { Text } from "../ui/text";
 import { format } from "date-fns";
 import Icon, { IconNames } from "../ui/icons";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface IResourceCardProps {
   title: string;
@@ -46,20 +47,22 @@ export function ResourceCard({
         className
       )}
     >
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          {title}
-          {iconName && <Icon name={iconName} size={20} />}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Text dimmed className="text-sm">
-          {description}
-        </Text>
-        <Text dimmed className="text-sm">
-          {timestamp && format(timestamp, "dd MMM, yyyy, HH:mm")}
-        </Text>
-      </CardContent>
+      <Link href={href}>
+        <CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            {title}
+            {iconName && <Icon name={iconName} size={20} />}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Text dimmed className="text-sm">
+            {description}
+          </Text>
+          <Text dimmed className="text-sm">
+            {timestamp && format(timestamp, "dd MMM, yyyy, HH:mm")}
+          </Text>
+        </CardContent>
+      </Link>
     </Card>
   );
 }
