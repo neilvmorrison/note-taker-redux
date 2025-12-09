@@ -1,5 +1,4 @@
 import { IconType } from "react-icons";
-import { LuClock3, LuMailCheck, LuMailX } from "react-icons/lu";
 import { BiError } from "react-icons/bi";
 import * as Bi from "react-icons/bi";
 import * as Fi from "react-icons/fi";
@@ -74,9 +73,9 @@ export default function Icon({
       case "send":
         return Fi.FiSend;
       case "email_check":
-        return LuMailCheck;
+        return Lu.LuMailCheck;
       case "email_x":
-        return LuMailX;
+        return Lu.LuMailX;
 
       case "edit":
         return Bi.BiEdit;
@@ -120,7 +119,7 @@ export default function Icon({
         return Pi.PiChat;
 
       default:
-        return LuMailX;
+        return Lu.LuMailX;
     }
   };
 

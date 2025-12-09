@@ -10,7 +10,7 @@ interface IResourceCardProps {
   description: string;
   type: "note" | "project" | "chat";
   timestamp?: string;
-  href?: string;
+  href: string;
   icon?: IconNames;
   className?: string;
 }
