@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ActivityItem } from "@/hooks/use-recent-activity";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -9,15 +8,16 @@ import {
   SidebarMenuSkeleton,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { FileIcon, FolderIcon } from "lucide-react";
+import { FileIcon, FolderIcon, MessageCircleIcon } from "lucide-react";
+import { IActivityItem } from "@/hooks/use-recent-activity";
 
 interface RecentActivityListProps {
-  items: ActivityItem[] | null;
+  items: IActivityItem[];
   isLoading?: boolean;
   title: string;
   maxItems?: number;
   className?: string;
-  type?: "note" | "project" | "all";
+  type?: "note" | "project" | "chat" | "all";
 }
 
 export function RecentActivityList({
@@ -62,8 +62,12 @@ export function RecentActivityList({
                 <Link href={item.url} className="flex items-center gap-2">
                   {item.type === "note" ? (
                     <FileIcon className="h-4 w-4 shrink-0" />
-                  ) : (
+                  ) : item.type === "project" ? (
                     <FolderIcon className="h-4 w-4 shrink-0" />
+                  ) : item.type === "chat" ? (
+                    <MessageCircleIcon className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <FileIcon className="h-4 w-4 shrink-0" />
                   )}
                   <span className="truncate">{item.title}</span>
                 </Link>
